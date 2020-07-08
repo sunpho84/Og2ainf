@@ -346,6 +346,9 @@ int main(int narg,char **arg)
   IntSa0[0] += 2.0*(-1.0 + M_PI*M_PI*(-3.0+22.0*Z0))/3.0;
   IntSa0[1] += -4.0/3.0 + EulerGamma - F0 + log(P2) + 2.0*M_PI*M_PI - 38.0*M_PI*M_PI*Z0/3.0;
   
+  printf("--- INTEGRALS ---------------------------------------------------- \n");
+  printf("i \t IntV \t \t IntV(a=0) \t IntS \t \t IntS(a=0)\n");
+  printf("------------------------------------------------------------------ \n");
   for(int i=0; i<12; i++)
     {
       printf("%d \t %lf \t %lf",i,Int[i],Inta0[i]);
@@ -353,4 +356,18 @@ int main(int narg,char **arg)
       else printf("\n");
     }
 
+  vector<double> Vert   = compute_V(Int);
+  vector<double> Verta0 = compute_V(Inta0);
+  double Sigma1   = compute_S(IntS);
+  double Sigma1a0 = compute_S(IntSa0);
+
+  double h1[5] = {  4.0, -4.0, -2.0,  2.0, 0.0};
+  double h2[5] = { 16.0, 16.0,  4.0,  4.0, 0.0};
+  double h3[5] = {  1.0, -1.0,  0.5, -0.5, 0.0};
+  double h4[5];
+  for (int i=0; i<5, i++) h4[i] = (h2[i]/4.0-1.0)/3.0;
+
+
+
+  exit(0);
 }
