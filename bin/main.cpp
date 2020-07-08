@@ -34,14 +34,13 @@ vector<double> j,k,kt,kt2_v,kt4_v,kt6_v,s_v,ss_v,s2_v,ss2_v,c_v,cc_v,
 
 void intComp(vd_t& Int, vd_t& Inta0,vd_t& IntS,vd_t& IntSa0,int i)
 {
-  int j=i;
-  int i4=j%T;
-  j/=T;
-  int i3=j%L;
-  j/=L;
-  int i2=j%L;
-  j/=L;
-  int i1=j;
+  int i4=i%T;
+  i/=T;
+  int i3=i%L;
+  i/=L;
+  int i2=i%L;
+  i/=L;
+  int i1=i;
 
   Vector4d kt2, kt4, kt6;
   Vector4d s,ss,s2,ss2,c,cc;
