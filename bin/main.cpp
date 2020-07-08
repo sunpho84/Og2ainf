@@ -93,10 +93,12 @@ int main(int narg,char **arg)
   Np0 = 4.0 - (np.array() == 0).count();
 
   Vector4d ap = 2.0*M_PI*np.cwiseProduct(V.cwiseInverse());
+  double P2 = prod(ap,ap);
+
   Vector4d p = Vector4d::Zero();
   for(int i=0; i<4; i++)
   {
-    if(sin(ap(i))) p(i) = 1.0/sin(ap(i));
+    if(sin(ap(i))) p(i) = P2/Np0/sin(ap(i));
   }
 
   int L3T = 3*L+T;
@@ -125,7 +127,7 @@ int main(int narg,char **arg)
   Vector4d kt2, kt4, kt6;
   Vector4d s,ss,s2,ss2,c,cc;
   Vector4d sp,cp,sp2,sq2,ssp,ssp2;
-  double P2, S2, SP2, SQ2, SS2, SSP2;
+  double S2, SP2, SQ2, SS2, SSP2;
   double Jac, Fac;
   double Delta1, Delta2, Delta1p, Delta2p, Den;
   double SxSP, CxCP, SSxSSP, S2xSP2, S2xSS2, S2xSSP2, SP2xSSP2, S2xSSxSSP, CPxSxSS, CPxSxSSP, CPxSPxSSP, CxCPxSSxSSP, CxSPxSSP, CCxS2xSS2;
@@ -135,7 +137,8 @@ int main(int narg,char **arg)
   double PxCPxSxAtxCPxSxSSP, PxCPxSxAtxSxSP, PxCPxSPxAtxS2, PxCxCPxSSxAtxS2, PxCxSPxAtxS2, PxSSPxAtxS2, PxSP2xSSPxAtxS2, PxS2xSSPxAtxS2, PxS2xSSxAtxS2, PxSSxAtxCPxSxSS, PxSSxAtxSSxSSP, PxSSxAtxSxSP, PxSSxAtxSS2, PxSSxAtxS2;
   Matrix4d A;
 
-  P2 = PxSINP = prod(ap,ap);
+  PxSINP = P2;
+
 
   vd_t Int(0.0,12), Inta0(0.0,12), IntS(0.0,10), IntSa0(0.0,10);
 
@@ -151,7 +154,7 @@ int main(int narg,char **arg)
   for(int i3=0; i3<L; i3++)
   for(int i4=0; i4<T; i4++)
   {
-    Jac = j[i1]*j[i2]*j[i3]*j[14+L];
+    Jac = j[i1]*j[i2]*j[i3]*j[i4+L];
 
     kt2 << kt2_v[i1],kt2_v[i2],kt2_v[i3],kt2_v[i4+L];
     kt4 << kt4_v[i1],kt4_v[i2],kt4_v[i3],kt4_v[i4+L];
@@ -302,15 +305,14 @@ int main(int narg,char **arg)
     // IntSa0[7]  += 0.0;
     // IntSa0[8]  += 0.0;
     // IntSa0[9]  += 0.0;
-
-    if(i1==0 and i2==0 and i3==0 and i4==1){
-      cout<<CCxS2xSS2xAtxS2<<endl;
-      exit(0);
-    }
-
-
-
   }
+
+  for(int i=0; i<12; i++)
+    {
+      printf("%d \t %lf \t %lf",i,Int[i],Inta0[i]);
+      if(i<10) printf(" \t %lf \t %lf\n",IntS[i],IntSa0[i]);
+      else printf("\n");
+    }
 
   // for(int i1=0; i1<L; i1++)
   // for(int i2=0; i2<L; i2++)
