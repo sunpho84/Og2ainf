@@ -48,7 +48,6 @@ inline Matrix4d make_propagator(Vector4d kt2_dir, Vector4d kt4_dir, Vector4d kt6
   Matrix4d ktpo2, ktso2, A;
 
   double c12 = c1*c1, c13 = c12*c1;
-  int kron_delta[4][4]={{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 
   double kt2 = prod(kt2_dir), kt4 = prod(kt4_dir), kt6 = prod(kt6_dir);
 
