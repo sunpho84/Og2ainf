@@ -30,7 +30,7 @@ Vector4d p;
 double P2;
 double PxSINP;
 vector<double> j,k,kt,kt2_v,kt4_v,kt6_v,s_v,ss_v,s2_v,ss2_v,c_v,cc_v,
-  kn,kp,sp_v,cp_v,sp2_v,sq2_v,ssp_v,ssp2_v;
+kn,kp,sp_v,cp_v,sp2_v,sq2_v,ssp_v,ssp2_v;
 
 void intComp(vd_t& Int,vd_t& IntS,int i)
 {
@@ -234,29 +234,28 @@ int main(int narg,char **arg)
   cc_v.resize(LT);
 
   #pragma omp parallel for
-  for(int p=0; p<dim.size(); p++){
-    for(int i=0; i<dim(p); i++){
+  for(int l=0; l<LT; l++)
+  {
+    int p=(l>=L) /* 0 if l<L or 1 if l>=L */;
+    int i=l-p*L;
 
-      int l = i + dim(0)*p;
+    k[l] = 2.0*M_PI/dim(p)*(i+0.5) - al*sin(2.0*M_PI/dim(p)*(i+0.5));
 
-      k[l] = 2.0*M_PI/dim(p)*(i+0.5) - al*sin(2.0*M_PI/dim(p)*(i+0.5));
+    kt[l] = 2.0*sin(k[l]/2.0); /*ktilde*/
+    kt2_v[l] = kt[l]*kt[l];
+    kt4_v[l] = kt2_v[l]*kt2_v[l];
+    kt6_v[l] = kt4_v[l]*kt2_v[l];
 
-      kt[l] = 2.0*sin(k[l]/2.0); /*ktilde*/
-      kt2_v[l] = kt[l]*kt[l];
-      kt4_v[l] = kt2_v[l]*kt2_v[l];
-      kt6_v[l] = kt4_v[l]*kt2_v[l];
+    j[l] = 1.0 - cos(2.0*M_PI/dim(p)*(i+0.5));
 
-      j[l] = 1.0 - cos(2.0*M_PI/dim(p)*(i+0.5));
+    s_v[l]    = sin(k[l]/2.0);
+    ss_v[l]   = sin(k[l]);
 
-      s_v[l]    = sin(k[l]/2.0);
-      ss_v[l]   = sin(k[l]);
+    c_v[l]    = cos(k[l]/2.0);
+    cc_v[l]   = cos(k[l]);
 
-      c_v[l]    = cos(k[l]/2.0);
-      cc_v[l]   = cos(k[l]);
-
-      s2_v[l]   = s_v[l]*s_v[l];
-      ss2_v[l]  = ss_v[l]*ss_v[l];
-    }
+    s2_v[l]   = s_v[l]*s_v[l];
+    ss2_v[l]  = ss_v[l]*ss_v[l];
   }
 
   /* External momentum   --->  va in un loop */
@@ -289,33 +288,36 @@ int main(int narg,char **arg)
   ssp2_v.resize(L3T);
 
   #pragma omp parallel for
-  for(int p=0; p<V.size(); p++){
-    for(int i=0; i<V(p); i++){
-      int j = i + L*p;
+  for(int j=0; j<L3T; j++)
+  {
+    int q = (j>=L)+(j>=2*L);
+    int p = q+(j>=3*L);
+    int l = j-q*L;
 
-      kn[j] = k[i + L*(int)(p/3)] + 2.0*ap(p);
-      kp[j] = k[i + L*(int)(p/3)] + ap(p);
+    kn[j] = k[l] + 2.0*ap(p);
+    kp[j] = k[l] + ap(p);
 
-      sp_v[j]   = sin(kn[j]/2.0);
-      cp_v[j]   = cos(kn[j]/2.0);
+    sp_v[j]   = sin(kn[j]/2.0);
+    cp_v[j]   = cos(kn[j]/2.0);
 
-      sp2_v[j]  = sp_v[j]*sp_v[j];
-      sq2_v[j]  = pow(sin(kp[j]/2.0),2.0);
+    sp2_v[j]  = sp_v[j]*sp_v[j];
+    sq2_v[j]  = pow(sin(kp[j]/2.0),2.0);
 
-      ssp_v[j]  = sin(kp[j]);
-      ssp2_v[j] = ssp_v[j]*ssp_v[j];
-    }
+    ssp_v[j]  = sin(kp[j]);
+    ssp2_v[j] = ssp_v[j]*ssp_v[j];
   }
 
- PxSINP = P2;
+  PxSINP = P2;
+
+  // exit(0);
 
   vd_t Int(0.0,12), Inta0(0.0,12), IntS(0.0,10), IntSa0(0.0,10);
 
   #pragma omp parallel  for reduction(vd_t_plus:Int,Inta0,IntSa0,IntS)
   for(int i=0;i<L*L*L*T;i++)
-    {
-      intComp(Int,IntS,i);
-    }
+  {
+    intComp(Int,IntS,i);
+  }
 
   Int[0] -= (7.0 + M_PI*M_PI*(44.0*Z0 - 6.0))/6.0;
   Int[1] -= 4.0/3.0 - EulerGamma + F0 - log(P2) + M_PI*M_PI - 28.0*Z0*M_PI*M_PI/3.0;
@@ -327,11 +329,11 @@ int main(int narg,char **arg)
   printf("i \t IntV \t \t IntV(a=0)\n");
   printf("---------------------------------- \n");
   for(int i=0; i<12; i++)
-    {
-      printf("%d \t %lf",i,Int[i]);
-      if(i<10) printf(" \t %lf\n",IntS[i]);
-      else printf("\n");
-    }
+  {
+    printf("%d \t %lf",i,Int[i]);
+    if(i<10) printf(" \t %lf\n",IntS[i]);
+    else printf("\n");
+  }
 
   string RCs[6] = {"q","S","P","V","A","T"};
   vector<double> DeltaZ = compute_Z(Int,IntS);
@@ -340,9 +342,9 @@ int main(int narg,char **arg)
   printf("i \t RC \t \t DeltaZ\n");
   printf("---------------------------------- \n");
   for(int i=0; i<6; i++)
-    {
-      printf("%s \t %lf\n",RCs[i].c_str(),DeltaZ[i]);
-    }
+  {
+    printf("%s \t %lf\n",RCs[i].c_str(),DeltaZ[i]);
+  }
 
   exit(0);
 }
