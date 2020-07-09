@@ -26,13 +26,14 @@
 
 #pragma omp declare reduction(vd_t_plus : vd_t : omp_out += omp_in) initializer(omp_priv=omp_orig)
 
-Vector4d p;
+array<double,4> p;
 double P2;
 double PxSINP;
 vector<double> j,k,kt,kt2_v,kt4_v,kt6_v,s_v,ss_v,s2_v,ss2_v,c_v,cc_v,
 kn,kp,sp_v,cp_v,sp2_v,sq2_v,ssp_v,ssp2_v;
 
-void intComp(vd_t& Int,vd_t& IntS,int i)
+template <typename F>
+void intComp(valarray<F>& Int,valarray<F>& IntS,int i)
 {
   int i4=i%T;
   i/=T;
@@ -42,47 +43,119 @@ void intComp(vd_t& Int,vd_t& IntS,int i)
   i/=L;
   int i1=i;
 
-  Vector4d kt2, kt4, kt6;
-  Vector4d s,ss,s2,ss2,c,cc;
-  Vector4d sp,cp,sp2,sq2,ssp,ssp2;
-  double S2, SP2, SQ2, SS2, SSP2;
-  double Fac;
-  double Delta1, Delta2, Delta1p, Delta2p;
-  double Delta12, Delta13, Delta14, Delta22, Delta1p2, Delta2p2, Delta12p2, Den;
-  double SxSP, CxCP, SSxSSP, S2xSP2, S2xSS2, S2xSSP2, SP2xSSP2, S2xSSxSSP, CPxSxSS, CPxSxSSP, CPxSPxSSP, CxCPxSSxSSP, CxSPxSSP, CCxS2xSS2;
-  double PxSS, PxSSP, PxCPxS, PxS2xSSP, PxS2xSS, PxCxCPxSS, PxCPxSP, PxCxSP, PxSP2xSSP;
-  double CCxS2xSS2xAtxS2, S2xSS2xAtxSS2, S2xSS2xAtxS2, SS2xAtxSS2, SS2xAtxS2, S2xAtxS2, AtxS2;
-  double CPxSxSSPxAtxCPxSxSSP, CPxSxSSxAtxSSxSSP, CPxSxSSPxAtxSxSP, CPxSPxSSPxAtxS2, CxCPxSSxSSPxAtxS2, CxSPxSSPxAtxS2, CxCPxAtxS2, S2xSSxSSPxAtxS2, S2xSSP2xAtxS2, SP2xSSP2xAtxS2, SSxSSPxAtxSSxSSP, SSxSSPxAtxSxSP, SSxSSPxAtxSS2, SSxSSPxAtxS2, SxSPxAtxSxSP, SSP2xAtxS2, SP2xAtxS2;
-  double PxCPxSxAtxCPxSxSSP, PxCPxSxAtxSxSP, PxCPxSPxAtxS2, PxCxCPxSSxAtxS2, PxCxSPxAtxS2, PxSSPxAtxS2, PxSP2xSSPxAtxS2, PxS2xSSPxAtxS2, PxS2xSSxAtxS2, PxSSxAtxCPxSxSS, PxSSxAtxSSxSSP, PxSSxAtxSxSP, PxSSxAtxSS2, PxSSxAtxS2;
-  Matrix4d A;
+  array<F,4> kt2, kt4, kt6;
+  array<F,4> s,ss,s2,ss2,c,cc;
+  array<F,4> sp,cp,sp2,sq2,ssp,ssp2;
+  F S2=F(), SP2=F(), SQ2=F(), SS2=F(), SSP2=F();
+  F Fac;
+  F Delta1, Delta2, Delta1p, Delta2p;
+  F Delta12, Delta13, Delta14, Delta22, Delta1p2, Delta2p2, Delta12p2, Den;
+  F SxSP=F(), CxCP=F(), SSxSSP=F(), S2xSP2=F(), S2xSS2=F(), S2xSSP2=F(), SP2xSSP2=F(), S2xSSxSSP=F(), CPxSxSS=F(), CPxSxSSP=F(), CPxSPxSSP=F(), CxCPxSSxSSP=F(), CxSPxSSP=F(), CCxS2xSS2=F();
+  F PxSS=F(), PxSSP=F(), PxCPxS=F(), PxS2xSSP=F(), PxS2xSS=F(), PxCxCPxSS=F(), PxCPxSP=F(), PxCxSP=F(), PxSP2xSSP=F();
+  F CCxS2xSS2xAtxS2=F(), S2xSS2xAtxSS2=F(), S2xSS2xAtxS2=F(), SS2xAtxSS2=F(), SS2xAtxS2=F(), S2xAtxS2=F(), AtxS2=F();
+  F CPxSxSSPxAtxCPxSxSSP=F(), CPxSxSSxAtxSSxSSP=F(), CPxSxSSPxAtxSxSP=F(), CPxSPxSSPxAtxS2=F(), CxCPxSSxSSPxAtxS2=F(), CxSPxSSPxAtxS2=F(), CxCPxAtxS2=F(), S2xSSxSSPxAtxS2=F(), S2xSSP2xAtxS2=F(), SP2xSSP2xAtxS2=F(), SSxSSPxAtxSSxSSP=F(), SSxSSPxAtxSxSP=F(), SSxSSPxAtxSS2=F(), SSxSSPxAtxS2=F(), SxSPxAtxSxSP=F(), SSP2xAtxS2=F(), SP2xAtxS2=F();
+  F PxCPxSxAtxCPxSxSSP=F(), PxCPxSxAtxSxSP=F(), PxCPxSPxAtxS2=F(), PxCxCPxSSxAtxS2=F(), PxCxSPxAtxS2=F(), PxSSPxAtxS2=F(), PxSP2xSSPxAtxS2=F(), PxS2xSSPxAtxS2=F(), PxS2xSSxAtxS2=F(), PxSSxAtxCPxSxSS=F(), PxSSxAtxSSxSSP=F(), PxSSxAtxSxSP=F(), PxSSxAtxSS2=F(), PxSSxAtxS2=F();
+  array<array<F,4>,4> A;
 
   Fac = j[i1]*j[i2]*j[i3]*j[i4+L]*16.0*M_PI*M_PI/(L*L*L*T);
 
-  kt2 << kt2_v[i1],kt2_v[i2],kt2_v[i3],kt2_v[i4+L];
-  kt4 << kt4_v[i1],kt4_v[i2],kt4_v[i3],kt4_v[i4+L];
-  kt6 << kt6_v[i1],kt6_v[i2],kt6_v[i3],kt6_v[i4+L];
+  kt2 = {kt2_v[i1],kt2_v[i2],kt2_v[i3],kt2_v[i4+L]};
+  kt4 = {kt4_v[i1],kt4_v[i2],kt4_v[i3],kt4_v[i4+L]};
+  kt6 = {kt6_v[i1],kt6_v[i2],kt6_v[i3],kt6_v[i4+L]};
 
-  s   << s_v[i1],s_v[i2],s_v[i3],s_v[i4+L];
-  ss  << ss_v[i1],ss_v[i2],ss_v[i3],ss_v[i4+L];
-  s2  << s2_v[i1],s2_v[i2],s2_v[i3],s2_v[i4+L];
-  ss2 << ss2_v[i1],ss2_v[i2],ss2_v[i3],ss2_v[i4+L];
-  c   << c_v[i1],c_v[i2],c_v[i3],c_v[i4+L];
-  cc  << cc_v[i1],cc_v[i2],cc_v[i3],cc_v[i4+L];
+  s   = {s_v[i1],s_v[i2],s_v[i3],s_v[i4+L]};
+  ss  = {ss_v[i1],ss_v[i2],ss_v[i3],ss_v[i4+L]};
+  s2  = {s2_v[i1],s2_v[i2],s2_v[i3],s2_v[i4+L]};
+  ss2 = {ss2_v[i1],ss2_v[i2],ss2_v[i3],ss2_v[i4+L]};
+  c   = {c_v[i1],c_v[i2],c_v[i3],c_v[i4+L]};
+  cc  = {cc_v[i1],cc_v[i2],cc_v[i3],cc_v[i4+L]};
 
-  sp   << sp_v[i1],sp_v[i2+L],sp_v[i3+2*L],sp_v[i4+3*L];
-  cp   << cp_v[i1],cp_v[i2+L],cp_v[i3+2*L],cp_v[i4+3*L];
-  sp2  << sp2_v[i1],sp2_v[i2+L],sp2_v[i3+2*L],sp2_v[i4+3*L];
-  sq2  << sq2_v[i1],sq2_v[i2+L],sq2_v[i3+2*L],sq2_v[i4+3*L];
-  ssp  << ssp_v[i1],ssp_v[i2+L],ssp_v[i3+2*L],ssp_v[i4+3*L];
-  ssp2 << ssp2_v[i1],ssp2_v[i2+L],ssp2_v[i3+2*L],ssp2_v[i4+3*L];
+  sp   = {sp_v[i1],sp_v[i2+L],sp_v[i3+2*L],sp_v[i4+3*L]};
+  cp   = {cp_v[i1],cp_v[i2+L],cp_v[i3+2*L],cp_v[i4+3*L]};
+  sp2  = {sp2_v[i1],sp2_v[i2+L],sp2_v[i3+2*L],sp2_v[i4+3*L]};
+  sq2  = {sq2_v[i1],sq2_v[i2+L],sq2_v[i3+2*L],sq2_v[i4+3*L]};
+  ssp  = {ssp_v[i1],ssp_v[i2+L],ssp_v[i3+2*L],ssp_v[i4+3*L]};
+  ssp2 = {ssp2_v[i1],ssp2_v[i2+L],ssp2_v[i3+2*L],ssp2_v[i4+3*L]};
 
   A = make_propagator(kt2,kt4,kt6);
 
-  S2   = prod(s2);
-  SP2  = prod(sp2);
-  SQ2  = prod(sq2);
-  SS2  = prod(ss2);
-  SSP2 = prod(ssp2);
+  #pragma unroll
+  for(int mu=0; mu<4; mu++){
+    S2   += s2[mu];
+    SP2  += sp2[mu];
+    SQ2  += sq2[mu];
+    SS2  += ss2[mu];
+    SSP2 += ssp2[mu];
+
+    SxSP        += s[mu]*sp[mu];
+    CxCP        += c[mu]*cp[mu];
+    SSxSSP      += ss[mu]*ssp[mu];
+    S2xSP2      += s2[mu]*sp2[mu];
+    S2xSS2      += s2[mu]*ss2[mu];
+    S2xSSP2     += s2[mu]*ssp2[mu];
+    SP2xSSP2    += sp2[mu]*ssp2[mu];
+    S2xSSxSSP   += s2[mu]*ss[mu]*ssp[mu];
+    CPxSxSS     += cp[mu]*s[mu]*ss[mu];
+    CPxSxSSP    += cp[mu]*s[mu]*ssp[mu];
+    CPxSPxSSP   += cp[mu]*sp[mu]*ssp[mu];
+    CxCPxSSxSSP += c[mu]*cp[mu]*ss[mu]*ssp[mu];
+    CxSPxSSP    += c[mu]*sp[mu]*ssp[mu];
+    CCxS2xSS2   += cc[mu]*s2[mu]*ss2[mu];
+
+    PxSS      += p[mu]*ss[mu];
+    PxSSP     += p[mu]*ssp[mu];
+    PxCPxS    += p[mu]*cp[mu]*s[mu];
+    PxS2xSSP  += p[mu]*s2[mu]*ssp[mu];
+    PxS2xSS   += p[mu]*s2[mu]*ss[mu];
+    PxCxCPxSS += p[mu]*c[mu]*cp[mu]*ss[mu];
+    PxCPxSP   += p[mu]*cp[mu]*sp[mu];
+    PxCxSP    += p[mu]*c[mu]*sp[mu];
+    PxSP2xSSP += p[mu]*sp2[mu]*ssp[mu];
+
+    for(int nu=0; nu<4; nu++)
+    {
+      CCxS2xSS2xAtxS2 += cc[mu]*s2[mu]*ss2[mu]*A[mu][nu]*s2[nu];
+      S2xSS2xAtxSS2   += s2[mu]*ss2[mu]*A[mu][nu]*ss2[nu];
+      S2xSS2xAtxS2    += s2[mu]*ss2[mu]*A[mu][nu]*s2[nu];
+      SS2xAtxSS2      += ss2[mu]*A[mu][nu]*ss2[nu];
+      SS2xAtxS2       += ss2[mu]*A[mu][nu]*s2[nu];
+      S2xAtxS2        += s2[mu]*A[mu][nu]*s2[nu];
+      AtxS2           += A[mu][nu]*s2[nu];
+
+      CPxSxSSPxAtxCPxSxSSP += cp[mu]*s[mu]*ssp[mu]*A[mu][nu]*cp[nu]*s[nu]*ssp[nu];
+      CPxSxSSxAtxSSxSSP  += cp[mu]*s[mu]*ss[mu]*A[mu][nu]*ss[nu]*ssp[nu];
+      CPxSxSSPxAtxSxSP += cp[mu]*s[mu]*ssp[mu]*A[mu][nu]*s[nu]*sp[nu];
+      CPxSPxSSPxAtxS2  += cp[mu]*sp[mu]*ssp[mu]*A[mu][nu]*s2[nu];
+      CxCPxSSxSSPxAtxS2  += c[mu]*cp[mu]*ss[mu]*ssp[mu]*A[mu][nu]*s2[nu];
+      CxSPxSSPxAtxS2 += c[mu]*sp[mu]*ssp[mu]*A[mu][nu]*s2[nu];
+      CxCPxAtxS2 += c[mu]*cp[mu]*A[mu][nu]*s2[nu];
+      S2xSSxSSPxAtxS2  += s2[mu]*ss[mu]*ssp[mu]*A[mu][nu]*s2[nu];
+      S2xSSP2xAtxS2  += s2[mu]*ssp2[mu]*A[mu][nu]*s2[nu];
+      SP2xSSP2xAtxS2 += sp2[mu]*ssp2[mu]*A[mu][nu]*s2[nu];
+      SSxSSPxAtxSSxSSP += ss[mu]*ssp[mu]*A[mu][nu]*ss[nu]*ssp[nu];
+      SSxSSPxAtxSxSP += ss[mu]*ssp[mu]*A[mu][nu]*s[nu]*sp[nu];
+      SSxSSPxAtxSS2  += ss[mu]*ssp[mu]*A[mu][nu]*ss2[nu];
+      SSxSSPxAtxS2 += ss[mu]*ssp[mu]*A[mu][nu]*s2[nu];
+      SxSPxAtxSxSP += s[mu]*sp[mu]*A[mu][nu]*s[nu]*sp[nu];
+      SSP2xAtxS2 += ssp2[mu]*A[mu][nu]*s2[nu];
+      SP2xAtxS2  += sp2[mu]*A[mu][nu]*s2[nu];
+
+      PxCPxSxAtxCPxSxSSP += p[mu]*cp[mu]*s[mu]*A[mu][nu]*cp[nu]*s[nu]*ssp[nu];
+      PxCPxSxAtxSxSP += p[mu]*cp[mu]*s[mu]*A[mu][nu]*s[nu]*sp[nu];
+      PxCPxSPxAtxS2 += p[mu]*cp[mu]*sp[mu]*A[mu][nu]*s2[nu];
+      PxCxCPxSSxAtxS2 += p[mu]*c[mu]*cp[mu]*ss[mu]*A[mu][nu]*s2[nu];
+      PxCxSPxAtxS2 += p[mu]*c[mu]*sp[mu]*A[mu][nu]*s2[nu];
+      PxSSPxAtxS2 += p[mu]*ssp[mu]*A[mu][nu]*s2[nu];
+      PxSP2xSSPxAtxS2 += p[mu]*sp2[mu]*ssp[mu]*A[mu][nu]*s2[nu];
+      PxS2xSSPxAtxS2 += p[mu]*s2[mu]*ssp[mu]*A[mu][nu]*s2[nu];
+      PxS2xSSxAtxS2 += p[mu]*s2[mu]*ss[mu]*A[mu][nu]*s2[nu];
+      PxSSxAtxCPxSxSS += p[mu]*ss[mu]*A[mu][nu]*cp[nu]*s[nu]*ss[nu];
+      PxSSxAtxSSxSSP += p[mu]*ss[mu]*A[mu][nu]*ss[nu]*ssp[nu];
+      PxSSxAtxSxSP += p[mu]*ss[mu]*A[mu][nu]*s[nu]*sp[nu];
+      PxSSxAtxSS2 += p[mu]*ss[mu]*A[mu][nu]*ss2[nu];
+      PxSSxAtxS2 += p[mu]*ss[mu]*A[mu][nu]*s2[nu];
+    }
+  }
 
   Delta1 = S2;
   Delta1p = SQ2;
@@ -98,72 +171,6 @@ void intComp(vd_t& Int,vd_t& IntS,int i)
   Delta12p2 = Delta1*Delta2p2;
 
   Den = (Delta12*Delta2p2);
-
-  SxSP = prod(s,sp);
-  CxCP = prod(c,cp);
-  SSxSSP = prod(ss,ssp);
-  S2xSP2 = prod(s2,sp2);
-  S2xSS2 = prod(s2,ss2);
-  S2xSSP2 = prod(s2,ssp2);
-  SP2xSSP2 = prod(sp2,ssp2);
-  S2xSSxSSP = prod(s2,ss,ssp);
-  CPxSxSS = prod(cp,s,ss);
-  CPxSxSSP = prod(cp,s,ssp);
-  CPxSPxSSP = prod(cp,sp,ssp);
-  CxCPxSSxSSP = prod(c,cp,ss,ssp);
-  CxSPxSSP = prod(c,sp,ssp);
-  CCxS2xSS2 = prod(cc,s2,ss2);
-
-  PxSS = prod(p,ss);
-  PxSSP  = prod(p,ssp);
-  PxCPxS = prod(p,cp,s);
-  PxS2xSSP = prod(p,s2,ssp);
-  PxS2xSS = prod(p,s2,ss);
-  PxCxCPxSS = prod(p,c,cp,ss);
-  PxCPxSP = prod(p,cp,sp);
-  PxCxSP = prod(p,c,sp);
-  PxSP2xSSP = prod(p,sp2,ssp);
-
-  CCxS2xSS2xAtxS2 = prod(cc,s2,ss2,A*s2);
-  S2xSS2xAtxSS2 = prod(s2,ss2,A*ss2);
-  S2xSS2xAtxS2 = prod(s2,ss2,A*s2);
-  SS2xAtxSS2 = prod(ss2,A*ss2);
-  SS2xAtxS2 = prod(ss2,A*s2);
-  S2xAtxS2 = prod(s2,A*s2);
-  AtxS2 = prod(A*s2);
-
-  CPxSxSSPxAtxCPxSxSSP = prod(cp,s,ssp,A*cwiseProduct(cp,s,ssp));
-  CPxSxSSxAtxSSxSSP = prod(cp,s,ss,A*cwiseProduct(ss,ssp));
-  CPxSxSSPxAtxSxSP = prod(cp,s,ssp,A*cwiseProduct(s,sp));
-  CPxSPxSSPxAtxS2 = prod(cp,sp,ssp,A*s2);
-  CxCPxSSxSSPxAtxS2 = prod(c,cp,ss,ssp,A*s2);
-  CxSPxSSPxAtxS2 = prod(c,sp,ssp,A*s2);
-  CxCPxAtxS2 = prod(c,cp,A*s2);
-  S2xSSxSSPxAtxS2 = prod(s2,ss,ssp,A*s2);
-  S2xSSP2xAtxS2 = prod(s2,ssp2,A*s2);
-  SP2xSSP2xAtxS2 = prod(sp2,ssp2,A*s2);
-  SSxSSPxAtxSSxSSP = prod(ss,ssp,A*cwiseProduct(ss,ssp));
-  SSxSSPxAtxSxSP = prod(ss,ssp,A*cwiseProduct(s,sp));
-  SSxSSPxAtxSS2 = prod(ss,ssp,A*ss2);
-  SSxSSPxAtxS2 = prod(ss,ssp,A*s2);
-  SxSPxAtxSxSP = prod(s,sp,A*cwiseProduct(s,sp));
-  SSP2xAtxS2 = prod(ssp2,A*s2);
-  SP2xAtxS2 = prod(sp2,A*s2);
-
-  PxCPxSxAtxCPxSxSSP = prod(p,cp,s,A*cwiseProduct(cp,s,ssp));
-  PxCPxSxAtxSxSP = prod(p,cp,s,A*cwiseProduct(s,sp));
-  PxCPxSPxAtxS2 = prod(p,cp,sp,A*s2);
-  PxCxCPxSSxAtxS2 = prod(p,c,cp,ss,A*s2);
-  PxCxSPxAtxS2 = prod(p,c,sp,A*s2);
-  PxSSPxAtxS2 = prod(p,ssp,A*s2);
-  PxSP2xSSPxAtxS2 = prod(p,sp2,ssp,A*s2);
-  PxS2xSSPxAtxS2 = prod(p,s2,ssp,A*s2);
-  PxS2xSSxAtxS2 = prod(p,s2,ss,A*s2);
-  PxSSxAtxCPxSxSS = prod(p,ss,A*cwiseProduct(cp,s,ss));
-  PxSSxAtxSSxSSP = prod(p,ss,A*cwiseProduct(ss,ssp));
-  PxSSxAtxSxSP = prod(p,ss,A*cwiseProduct(s,sp));
-  PxSSxAtxSS2 = prod(p,ss,A*ss2);
-  PxSSxAtxS2 = prod(p,ss,A*s2);
 
   /* Vertex Integrals (Int(ainf)-Int(a0))*/
   Int[0] += Fac*((-CPxSxSSP*CPxSxSSP/(4.*Den) + SSP2/(4.*Delta12p2)) - (-((16.0*Delta12 - Delta22)*SS2*(-4.0*Delta1 + SS2))/(256.0*Delta14*Delta22)));
@@ -239,14 +246,14 @@ int main(int narg,char **arg)
     int p=(l>=L) /* 0 if l<L or 1 if l>=L */;
     int i=l-p*L;
 
-    k[l] = 2.0*M_PI/dim(p)*(i+0.5) - al*sin(2.0*M_PI/dim(p)*(i+0.5));
+    k[l] = 2.0*M_PI/dim[p]*(i+0.5) - al*sin(2.0*M_PI/dim[p]*(i+0.5));
 
     kt[l] = 2.0*sin(k[l]/2.0); /*ktilde*/
     kt2_v[l] = kt[l]*kt[l];
     kt4_v[l] = kt2_v[l]*kt2_v[l];
     kt6_v[l] = kt4_v[l]*kt2_v[l];
 
-    j[l] = 1.0 - cos(2.0*M_PI/dim(p)*(i+0.5));
+    j[l] = 1.0 - cos(2.0*M_PI/dim[p]*(i+0.5));
 
     s_v[l]    = sin(k[l]/2.0);
     ss_v[l]   = sin(k[l]);
@@ -259,22 +266,24 @@ int main(int narg,char **arg)
   }
 
   /* External momentum   --->  va in un loop */
-  Vector4d np;
-  np(0) = 0.0;
-  np(1) = 4.0;
-  np(2) = 5.0;
-  np(3) = 6.0;
-  if(APBC) np(3) += 0.5;
+  array<double,4> np = {0.0, 4.0, 5.0, 6.0};
+  if(APBC) np[3] += 0.5;
 
-  Np0 = 4.0 - (np.array() == 0).count();
+  array<double,4> ap;
+  P2 = 0.0;
+  Np0 = 4.0;
 
-  Vector4d ap = 2.0*M_PI*np.cwiseProduct(V.cwiseInverse());
-  P2 = prod(ap,ap);
+  for(int mu=0; mu<4; mu++){
+    ap[mu] = 2.0*M_PI*np[mu]/V[mu];
+    P2 += ap[mu]*ap[mu];
+    if(np[mu]==0.0) Np0 -= 1.0;
+  }
+  PxSINP = P2;
 
-  p = Vector4d::Zero();
   for(int i=0; i<4; i++)
   {
-    if(sin(ap(i))) p(i) = P2/Np0/sin(ap(i));
+    if(sin(ap[i])) p[i] = P2/Np0/sin(ap[i]);
+    else p[i] = 0.0;
   }
 
   int L3T = 3*L+T;
@@ -294,8 +303,8 @@ int main(int narg,char **arg)
     int p = q+(j>=3*L);
     int l = j-q*L;
 
-    kn[j] = k[l] + 2.0*ap(p);
-    kp[j] = k[l] + ap(p);
+    kn[j] = k[l] + 2.0*ap[p];
+    kp[j] = k[l] + ap[p];
 
     sp_v[j]   = sin(kn[j]/2.0);
     cp_v[j]   = cos(kn[j]/2.0);
@@ -306,8 +315,6 @@ int main(int narg,char **arg)
     ssp_v[j]  = sin(kp[j]);
     ssp2_v[j] = ssp_v[j]*ssp_v[j];
   }
-
-  PxSINP = P2;
 
   // exit(0);
 

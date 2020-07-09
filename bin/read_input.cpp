@@ -185,8 +185,8 @@ void read_input_glb(const char path[])
     printf("*------------------------------------------------------*\n\n");
 
     T = 2*L;
-    dim << L,T;
-    V << L,L,L,T;
+    dim = {L,T};
+    V = {L,L,L,T};
     printf(" Volume = %d x %d\n",L,T);
 
     printf("    with BC: ");
