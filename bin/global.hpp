@@ -17,6 +17,7 @@ extern int T;
 extern Vector2d dim;
 extern Vector4d V;
 extern int APBC;
+extern int kron_delta[4][4];
 
 /* Action */
 extern double c1;

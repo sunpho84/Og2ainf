@@ -10,6 +10,7 @@ int T;
 Vector2d dim;
 Vector4d V;
 int APBC;
+int kron_delta[4][4]={{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 
 /* Action */
 double c1;
