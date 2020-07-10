@@ -79,7 +79,9 @@ void intComp(valarray<F>& Int,valarray<F>& IntS,int i)
 
   A = make_propagator(kt2,kt4,kt6);
 
-  #pragma unroll
+  // asm("#CIAO!");
+
+  // #pragma unroll
   for(int mu=0; mu<4; mu++){
     S2   += s2[mu];
     SP2  += sp2[mu];
@@ -156,6 +158,8 @@ void intComp(valarray<F>& Int,valarray<F>& IntS,int i)
       PxSSxAtxS2 += p[mu]*ss[mu]*A[mu][nu]*s2[nu];
     }
   }
+
+  // asm("#CIAO!");
 
   Delta1 = S2;
   Delta1p = SQ2;
@@ -318,9 +322,9 @@ int main(int narg,char **arg)
 
   // exit(0);
 
-  vd_t Int(0.0,12), Inta0(0.0,12), IntS(0.0,10), IntSa0(0.0,10);
+  vd_t Int(0.0,12), IntS(0.0,10);
 
-  #pragma omp parallel  for reduction(vd_t_plus:Int,Inta0,IntSa0,IntS)
+  #pragma omp parallel for reduction(vd_t_plus:Int,IntS)
   for(int i=0;i<L*L*L*T;i++)
   {
     intComp(Int,IntS,i);
@@ -345,9 +349,9 @@ int main(int narg,char **arg)
   string RCs[6] = {"q","S","P","V","A","T"};
   vector<double> DeltaZ = compute_Z(Int,IntS);
 
-  printf("--- CORRECTIONS O(g2ainf) -------- \n");
-  printf("i \t RC \t \t DeltaZ\n");
-  printf("---------------------------------- \n");
+  printf("--- CORRECTIONS O(g2ainf) -- \n");
+  printf("i \t DeltaZ\n");
+  printf("---------------------------- \n");
   for(int i=0; i<6; i++)
   {
     printf("%s \t %lf\n",RCs[i].c_str(),DeltaZ[i]);
