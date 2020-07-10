@@ -2,3 +2,9 @@
 /GRTAGS
 /GTAGS
 /build/
+config/*
+/configure
+/bin/config.hpp.in~
+/autom4te.cache/
+/aclocal.m4
+/Makefile.in
