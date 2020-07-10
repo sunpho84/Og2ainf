@@ -200,6 +200,8 @@ void read_input_glb(const char path[])
     else {cout<<"Action not available"<<endl<<endl; exit(0);}
 
     c1 = (action==1 ? 0.0 : (action==2 ? -1.0/12.0 : (action==9 ? -0.331 : (1.0/0.0))));
+    c12 = c1*c1;
+    c13 = c12*c1;
 
     printf("Action: %s  (c1 = %.3lf)\n",action_name.c_str(),c1);
 
