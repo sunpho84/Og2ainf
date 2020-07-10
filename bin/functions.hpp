@@ -48,8 +48,6 @@ inline array<array<T,4>,4> make_propagator(array<T,4> kt2_dir, array<T,4> kt4_di
 {
   array<array<T,4>,4> ktpo2, ktso2, A;
 
-  T c12 = c1*c1, c13 = c12*c1;
-
   T kt2=T(), kt4=T(), kt6=T();
 
   for(int mu=0; mu<4; mu++)

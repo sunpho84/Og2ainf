@@ -21,6 +21,8 @@ extern int kron_delta[4][4];
 
 /* Action */
 extern double c1;
+extern double c12;
+extern double c13;
 extern double r;
 extern double csw;
 extern double alpha;

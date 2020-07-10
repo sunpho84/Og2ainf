@@ -14,6 +14,8 @@ int kron_delta[4][4]={{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 
 /* Action */
 double c1;
+double c12;
+double c13;
 double r;
 double csw;
 double alpha;
