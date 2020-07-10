@@ -185,8 +185,8 @@ void read_input_glb(const char path[])
     printf("*------------------------------------------------------*\n\n");
 
     T = 2*L;
-    dim << L,T;
-    V << L,L,L,T;
+    dim = {L,T};
+    V = {L,L,L,T};
     printf(" Volume = %d x %d\n",L,T);
 
     printf("    with BC: ");
@@ -201,7 +201,12 @@ void read_input_glb(const char path[])
 
     c1 = (action==1 ? 0.0 : (action==2 ? -1.0/12.0 : (action==9 ? -0.331 : (1.0/0.0))));
 
-    printf("Action: %s  (c1 = %.3lf)",action_name.c_str(),c1);
+    printf("Action: %s  (c1 = %.3lf)\n",action_name.c_str(),c1);
+
+    printf("Gauge: ");
+    if(alpha==0.0) printf("Landau\n");
+    else if(alpha==1.0) printf("Feynman\n");
+    else {printf("NOT VALID!"); exit(0);}
 
 
     printf("\n\n");

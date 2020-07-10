@@ -14,9 +14,10 @@ using namespace Eigen;
 /* Volume */
 extern int L;
 extern int T;
-extern Vector2d dim;
-extern Vector4d V;
+extern array<int,2> dim;
+extern array<int,4> V;
 extern int APBC;
+extern int kron_delta[4][4];
 
 /* Action */
 extern double c1;
@@ -27,15 +28,15 @@ extern double beta;
 extern int action;
 
 /* External momentum */
-extern Vector4d np;
-extern Vector4d ap;
+extern array<double,4> np;
+extern array<double,4> ap;
 extern double Np0;
 
 /* Loop momentum */
 extern double al;
 
 /* Invariants */
-extern Vector4d Id;
+// extern Vector4d Id;
 
 
 #endif

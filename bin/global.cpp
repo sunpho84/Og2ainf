@@ -7,9 +7,10 @@ using namespace Eigen;
 /* Volume */
 int L;
 int T;
-Vector2d dim;
-Vector4d V;
+array<int,2> dim;
+array<int,4> V;
 int APBC;
+int kron_delta[4][4]={{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 
 /* Action */
 double c1;
@@ -20,12 +21,12 @@ double beta;
 int action;
 
 /* External momentum */
-Vector4d np;
-Vector4d ap;
+array<double,4> np;
+array<double,4> ap;
 double Np0;
 
 /* Loop momentum */
 double al;
 
 /* Invariants */
-Vector4d Id(1.0,1.0,1.0,1.0);
+// Vector4d Id(1.0,1.0,1.0,1.0);
