@@ -5,44 +5,6 @@
 using namespace Eigen;
 using namespace std;
 
-// inline Vector4d cwiseProduct(Vector4d a, Vector4d b)
-// {
-//   return a.cwiseProduct(b);
-// }
-// inline Vector4d cwiseProduct(Vector4d a, Vector4d b, Vector4d c)
-// {
-//   return a.cwiseProduct(b).cwiseProduct(c);
-// }
-// inline Vector4d cwiseProduct(Vector4d a, Vector4d b, Vector4d c, Vector4d d)
-// {
-//   return a.cwiseProduct(b).cwiseProduct(c).cwiseProduct(d);
-// }
-// inline Vector4d cwiseProduct(Vector4d a, Vector4d b, Vector4d c, Vector4d d, Vector4d e)
-// {
-//   return a.cwiseProduct(b).cwiseProduct(c).cwiseProduct(d).cwiseProduct(e);
-// }
-
-// inline double prod(Vector4d a)
-// {
-//   return a.dot(Id);
-// }
-// inline double prod(Vector4d a,Vector4d b)
-// {
-//   return a.dot(b);
-// };
-// inline double prod(Vector4d a,Vector4d b,Vector4d c)
-// {
-//   return cwiseProduct(a,b,c).dot(Id);
-// };
-// inline double prod(Vector4d a,Vector4d b,Vector4d c,Vector4d d)
-// {
-//   return cwiseProduct(a,b,c,d).dot(Id);
-// };
-// inline double prod(Vector4d a,Vector4d b,Vector4d c,Vector4d d,Vector4d e)
-// {
-//   return cwiseProduct(a,b,c,d,e).dot(Id);
-// };
-
 template <typename T>
 inline array<array<T,4>,4> make_propagator(array<T,4> kt2_dir, array<T,4> kt4_dir, array<T,4> kt6_dir)
 {
