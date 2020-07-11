@@ -33,7 +33,7 @@ vector<double> j,k,kt,kt2_v,kt4_v,kt6_v,s_v,ss_v,s2_v,ss2_v,c_v,cc_v,
 kn,kp,sp_v,cp_v,sp2_v,sq2_v,ssp_v,ssp2_v;
 
 template <typename F>
-void intComp(F *Int, F *IntS,int i, FILE *file)
+void intComp(F *Int, F *IntS,int i)
 {
   int jj=i;
   int i4=jj%T;
@@ -326,20 +326,14 @@ int main(int narg,char **arg)
     ssp2_v[j] = ssp_v[j]*ssp_v[j];
   }
 
-  string path = "Ints_" + to_string(nthreads);
-  FILE *file;
-  file = fopen (path.c_str(),"w");
-
   double Int[12]={0.0};
   double IntS[10]={0.0};
 
 #pragma omp parallel for reduction(+:Int,IntS)
   for(int i=0;i<L*L*L*T;i++)
   {
-    intComp(Int,IntS,i,file);
+    intComp(Int,IntS,i);
   }
-
-  fclose(file);
 
   Int[0] -= (7.0 + M_PI*M_PI*(44.0*Z0 - 6.0))/6.0;
   Int[1] -= 4.0/3.0 - EulerGamma + F0 - log(P2) + M_PI*M_PI - 28.0*Z0*M_PI*M_PI/3.0;
