@@ -88,10 +88,8 @@ inline array<array<T,4>,4> make_propagator(array<T,4> kt2_dir, array<T,4> kt4_di
   return A;
 }
 
-vector<double> compute_Z(valarray<double>& Int,valarray<double>& IntS);
+vector<double> compute_Z(double *Int, double *IntS);
 
-// vector<double> compute_V(valarray<double>& Int);
-// double compute_S(valarray<double>& Int);
 
 
 #endif

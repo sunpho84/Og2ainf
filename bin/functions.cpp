@@ -15,8 +15,7 @@ using namespace Eigen;
 using namespace std;
 
 
-
-vector<double> compute_V(vd_t& Int)
+vector<double> compute_V(double *Int)
 {
   vector<double> V(5);
   double VV00, VV10, VV11, VV12;
@@ -40,13 +39,15 @@ vector<double> compute_V(vd_t& Int)
 
   return V;
 }
-double compute_S(vd_t& Int)
+
+double compute_S(double *Int)
 {
   double S = Int[0] + alpha*Int[1] + Int[2] + alpha*Int[3] + csw*Int[4] + csw*csw*Int[5];
 
   return S ;
 }
-vector<double> compute_Z(vd_t& Int, vd_t& IntS)
+
+vector<double> compute_Z(double *Int, double *IntS)
 {
   vector<double> Z(6);
 

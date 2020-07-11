@@ -24,7 +24,7 @@
 #define F0 4.36923
 #define Z0 0.154933
 
-#pragma omp declare reduction(vd_t_plus : valarray<double> : omp_out += omp_in) initializer(omp_priv=omp_orig)
+// #pragma omp declare reduction(vd_t_plus : valarray<double> : omp_out += omp_in) initializer(omp_priv=omp_orig)
 
 array<double,4> p;
 double P2;
@@ -33,7 +33,7 @@ vector<double> j,k,kt,kt2_v,kt4_v,kt6_v,s_v,ss_v,s2_v,ss2_v,c_v,cc_v,
 kn,kp,sp_v,cp_v,sp2_v,sq2_v,ssp_v,ssp2_v;
 
 template <typename F>
-void intComp(valarray<F>& Int,valarray<F>& IntS,int i, FILE *file)
+void intComp(F *Int, F *IntS,int i, FILE *file)
 {
   int jj=i;
   int i4=jj%T;
@@ -191,21 +191,6 @@ void intComp(valarray<F>& Int,valarray<F>& IntS,int i, FILE *file)
   Int[10]+= Fac*((-(S2xSSP2*SS2)/(16.*Delta12p2)-(S2xSSP2xAtxS2*SS2)/(16.*Den)-(S2xSS2*SSP2)/(16.*Delta12p2)-(S2xSS2xAtxS2*SSP2)/(16.*Den)+(SS2*SSP2)/(16.*Delta2p2)-(AtxS2*SS2*SSP2)/(16.*Den)-(SS2*SSP2)/(8.*Delta12p2)+(S2xAtxS2*SS2*SSP2)/(16.*Den)+(SS2xAtxS2*SSP2)/(16.*Den)-(SS2xAtxSS2*SSP2)/(64.*Den)+(SS2*SSP2xAtxS2)/(16.*Den)+(S2xSSxSSP*SSxSSP)/(8.*Delta12p2)+(S2xSSxSSPxAtxS2*SSxSSP)/(8.*Den)-SSxSSP*SSxSSP/(16.*Delta2p2)+(AtxS2*SSxSSP*SSxSSP)/(16.*Den)+SSxSSP*SSxSSP/(8.*Delta12p2)-(S2xAtxS2*SSxSSP*SSxSSP)/(16.*Den)-(SSxSSP*SSxSSPxAtxS2)/(8.*Den)+(SSxSSP*SSxSSPxAtxSS2)/(32.*Den)-(SS2*SSxSSPxAtxSSxSSP)/(64.*Den))-(0.0));
   Int[11]+= Fac*(((Delta1p2*S2xSS2)/(4.*Delta12p2)+(Delta1p2*S2xSS2xAtxS2)/(4.*Den)-(Delta1p2*SS2)/(4.*Delta2p2)+(AtxS2*Delta1p2*SS2)/(4.*Den)+(3*Delta1p2*SS2)/(4.*Delta12p2)-(Delta1p2*S2xAtxS2*SS2)/(4.*Den)-(Delta1p2*SS2xAtxS2)/(4.*Den)+(Delta1p2*SS2xAtxSS2)/(16.*Den))-((4.0*S2xSS2xAtxS2 + 4.0*AtxS2*SS2 - 4.0*S2*S2*SS2 - 4.0*S2xAtxS2*SS2 + 4.0*S2*(S2xSS2 + 3*SS2) - 4.0*SS2xAtxS2 + SS2xAtxSS2)/(16.*Delta22)));
 
-  // fprintf(file,"%d \t 0 %lf\n",jj, Fac*((-CPxSxSSP*CPxSxSSP/(4.*Den) + SSP2/(4.*Delta12p2)) - (-((16.0*Delta12 - Delta22)*SS2*(-4.0*Delta1 + SS2))/(256.0*Delta14*Delta22))));
-  // fprintf(file,"%d \t 1 %lf\n",jj, Fac*((CPxSxSSP*CPxSxSSP/(4.*Den))-(((-1.0/(16.*Delta12) + 1.0/(Delta22))*SS2*SS2)/(16.0*Delta12))));
-  // fprintf(file,"%d \t 2 %lf\n",jj, Fac*((-CPxSxSSPxAtxCPxSxSSP/(4.*Den)+(CPxSPxSSPxAtxS2*Delta1p)/(Den)-(CPxSxSSPxAtxSxSP*Delta1p)/(Den)+(CPxSPxSSP*Delta1p)/(Delta12p2)+(Delta1p2*SP2)/(Delta12p2)+(Delta1p2*SP2xAtxS2)/(Den)-SP2xSSP2/(4.*Delta12p2)-SP2xSSP2xAtxS2/(4.*Den)+SSP2xAtxS2/(4.*Den)-(CPxSxSSP*Delta1p*SxSP)/(Den)-(Delta1p2*SxSP*SxSP)/(Den)-(Delta1p2*SxSPxAtxSxSP)/(Den))-(-(4.0*Delta1*S2xSS2 + 4.0*S2xSS2xAtxS2 - 4.0*SS2xAtxS2 + SS2xAtxSS2)/(16.0*Delta12*Delta22))));
-  // fprintf(file,"%d \t 3 %lf\n",jj, Fac*(((CPxSxSSP*Delta1p*SxSP)/(Den)+(Delta1p2*SxSP*SxSP)/(Den))-((2.0*S2*S2 + SS2)/(2.0*Delta22))));
-  // fprintf(file,"%d \t 4 %lf\n",jj, Fac*(((CPxSPxSSPxAtxS2*Delta1p)/(4.*Den)-(CPxSxSSPxAtxSxSP*Delta1p)/(4.*Den)+(CPxSPxSSP*Delta1p)/(4.*Delta12p2)-(AtxS2*Delta1p2)/(4.*Den)-(3*Delta1p2)/(4.*Delta12p2)-(Delta1p2*S2xSP2)/(4.*Den)+(Delta1p2*SP2)/(4.*Delta12p2)+(Delta1p2*SP2xAtxS2)/(4.*Den)-(SP2*SSP2)/(16.*Delta12p2)-(SP2xAtxS2*SSP2)/(16.*Den)-(CPxSxSSP*Delta1p*SxSP)/(4.*Den)+(SSP2*SxSP*SxSP)/(16.*Den)+(SSP2*SxSPxAtxSxSP)/(16.*Den))-((-4.0*AtxS2 - 16.0*S2 + 4.0*S2*S2 + 4.0*S2xAtxS2 + SS2)/(16.0*Delta22))));
-  // fprintf(file,"%d \t 5 %lf\n",jj, Fac*((-Delta1p2/(4.*Delta12p2) + (Delta1p2*S2xSP2)/(4.*Den) + (CPxSxSSP*Delta1p*SxSP)/(4.*Den) - (SSP2*SxSP*SxSP)/(16.*Den))-(0.0)));
-  // fprintf(file,"%d \t 6 %lf\n",jj, Fac*((CPxSxSSPxAtxCPxSxSSP/(4.*Den)+SP2xSSP2/(4.*Delta12p2)+SP2xSSP2xAtxS2/(4.*Den)+(AtxS2*SSP2)/(4.*Den)+(S2xSP2*SSP2)/(4.*Den)-(SP2*SSP2)/(4.*Delta12p2)-(SP2xAtxS2*SSP2)/(4.*Den)-SSP2xAtxS2/(4.*Den))-((4.0*Delta1*S2xSS2 + 4.0*S2xSS2xAtxS2 + 4.0*AtxS2*SS2 + 4.0*Delta1*SS2 - 4.0*Delta12*SS2 - 4.0*S2xAtxS2*SS2 - SS2*SS2 - 4.0*SS2xAtxS2 + SS2xAtxSS2)/(16.0*Delta12*Delta22))));
-  // fprintf(file,"%d \t 7 %lf\n",jj, Fac*((-(S2xSP2*SSP2)/(4.*Den))-((SS2*(-4.0*Delta1 + SS2))/(16.0*Delta12*Delta22))));
-  // fprintf(file,"%d \t 8 %lf\n",jj, Fac*(((CPxSxSSxAtxSSxSSP*Delta1p)/(16.*Den)-(CxCPxSSxSSPxAtxS2*Delta1p)/(8.*Den)-(CxCPxSSxSSP*Delta1p)/(8.*Delta12p2)+(CxCPxAtxS2*Delta1p*SSxSSP)/(8.*Den)+(CxCP*Delta1p*SSxSSP)/(8.*Delta12p2))-((4.0*Delta1*S2xSS2 + 4.0*S2xSS2xAtxS2 + 4.0*AtxS2*SS2 + 12.0*Delta1*SS2 - 4.0*Delta1*S2*SS2 - 4.0*S2xAtxS2*SS2 - 4.0*SS2xAtxS2 + SS2xAtxSS2)/(32.0*Delta1*Delta22))));
-  // fprintf(file,"%d \t 9 %lf\n",jj, Fac*(((S2xSSP2*SS2)/(64.*Delta12p2)+(S2xSSP2xAtxS2*SS2)/(64.*Den)-(SS2*SSP2)/(64.*Delta12p2)-(SS2*SSP2xAtxS2)/(64.*Den)-(S2xSSxSSP*SSxSSP)/(32.*Delta12p2)-(S2xSSxSSPxAtxS2*SSxSSP)/(32.*Den)+SSxSSP*SSxSSP/(64.*Delta2p2)-(AtxS2*SSxSSP*SSxSSP)/(64.*Den)-SSxSSP*SSxSSP/(32.*Delta12p2)+(S2xAtxS2*SSxSSP*SSxSSP)/(64.*Den)+(SSxSSP*SSxSSPxAtxS2)/(32.*Den)-(SSxSSP*SSxSSPxAtxSS2)/(128.*Den)+(SS2*SSxSSPxAtxSSxSSP)/(256.*Den))-(-(SS2*(4.0*Delta1*S2xSS2 + 4.0*S2xSS2xAtxS2 + 4.0*AtxS2*SS2 + 12.0*Delta1*SS2 - 4.0*Delta12*SS2 - 4.0*S2xAtxS2*SS2 - 4.0*SS2xAtxS2 + SS2xAtxSS2))/(256.0*Delta12*Delta22))));
-  // fprintf(file,"%d \t 10 %lf\n",jj, Fac*((-(S2xSSP2*SS2)/(16.*Delta12p2)-(S2xSSP2xAtxS2*SS2)/(16.*Den)-(S2xSS2*SSP2)/(16.*Delta12p2)-(S2xSS2xAtxS2*SSP2)/(16.*Den)+(SS2*SSP2)/(16.*Delta2p2)-(AtxS2*SS2*SSP2)/(16.*Den)-(SS2*SSP2)/(8.*Delta12p2)+(S2xAtxS2*SS2*SSP2)/(16.*Den)+(SS2xAtxS2*SSP2)/(16.*Den)-(SS2xAtxSS2*SSP2)/(64.*Den)+(SS2*SSP2xAtxS2)/(16.*Den)+(S2xSSxSSP*SSxSSP)/(8.*Delta12p2)+(S2xSSxSSPxAtxS2*SSxSSP)/(8.*Den)-SSxSSP*SSxSSP/(16.*Delta2p2)+(AtxS2*SSxSSP*SSxSSP)/(16.*Den)+SSxSSP*SSxSSP/(8.*Delta12p2)-(S2xAtxS2*SSxSSP*SSxSSP)/(16.*Den)-(SSxSSP*SSxSSPxAtxS2)/(8.*Den)+(SSxSSP*SSxSSPxAtxSS2)/(32.*Den)-(SS2*SSxSSPxAtxSSxSSP)/(64.*Den))-(0.0)));
-  // fprintf(file,"%d \t 11 %lf\n",jj,Fac*(((Delta1p2*S2xSS2)/(4.*Delta12p2)+(Delta1p2*S2xSS2xAtxS2)/(4.*Den)-(Delta1p2*SS2)/(4.*Delta2p2)+(AtxS2*Delta1p2*SS2)/(4.*Den)+(3*Delta1p2*SS2)/(4.*Delta12p2)-(Delta1p2*S2xAtxS2*SS2)/(4.*Den)-(Delta1p2*SS2xAtxS2)/(4.*Den)+(Delta1p2*SS2xAtxSS2)/(16.*Den))-((4.0*S2xSS2xAtxS2 + 4.0*AtxS2*SS2 - 4.0*S2*S2*SS2 - 4.0*S2xAtxS2*SS2 + 4.0*S2*(S2xSS2 + 3*SS2) - 4.0*SS2xAtxS2 + SS2xAtxSS2)/(16.*Delta22))));
-
-
-
   /* Self-Energy Integrals (IntS(ainf)-IntS(a0))*/
   IntS[0] += Fac*((-(2.0*CPxSxSSP*PxCPxS + Delta1*PxSSP)/(4.0*Delta12*Delta2p*P2))-((Delta1*S2xSS2*((0.125*Delta1 - 0.03125*Delta2)*Delta2 - 0.125*Delta1*SS2) + SS2*(Delta1*Delta2*(-0.0625*Delta1 + 0.0625*Delta12 + 0.015625*Delta2 - 0.015625*Delta1*Delta2) + (0.0625*Delta12 + 0.125*Delta13 - 0.00390625*Delta22)*SS2))/(Delta14*Delta22)));
   IntS[1] += Fac*(((2.0*CPxSxSSP*PxCPxS - Delta1*PxSSP)/(4.0*Delta12*Delta2p*P2))-((Delta1*S2xSS2*((-0.125*Delta1 + 0.03125*Delta2)*Delta2 + 0.125*Delta1*SS2) + SS2*(Delta12*(-0.0625*Delta1 + 0.015625*Delta2)*Delta2 + (-0.0625*Delta12 - 0.125*Delta13 + 0.00390625*Delta22)*SS2))/(Delta14*Delta22)));
@@ -217,14 +202,6 @@ void intComp(valarray<F>& Int,valarray<F>& IntS,int i, FILE *file)
   // IntS[7]  += 0.0;
   // IntS[8]  += 0.0;
   // IntS[9]  += 0.0;
-
-  // fprintf(file,"%d \t 0  %lf\n",jj,Fac*((-(2.0*CPxSxSSP*PxCPxS + Delta1*PxSSP)/(4.0*Delta12*Delta2p*P2))-((Delta1*S2xSS2*((0.125*Delta1 - 0.03125*Delta2)*Delta2 - 0.125*Delta1*SS2) + SS2*(Delta1*Delta2*(-0.0625*Delta1 + 0.0625*Delta12 + 0.015625*Delta2 - 0.015625*Delta1*Delta2) + (0.0625*Delta12 + 0.125*Delta13 - 0.00390625*Delta22)*SS2))/(Delta14*Delta22))));
-  // fprintf(file,"%d \t 1  %lf\n",jj,Fac*(((2.0*CPxSxSSP*PxCPxS - Delta1*PxSSP)/(4.0*Delta12*Delta2p*P2))-((Delta1*S2xSS2*((-0.125*Delta1 + 0.03125*Delta2)*Delta2 + 0.125*Delta1*SS2) + SS2*(Delta12*(-0.0625*Delta1 + 0.015625*Delta2)*Delta2 + (-0.0625*Delta12 - 0.125*Delta13 + 0.00390625*Delta22)*SS2))/(Delta14*Delta22))));
-  // fprintf(file,"%d \t 2  %lf\n",jj,Fac*(((32.0*Delta1*Delta1p*PxCPxSP + 32*Delta1p*PxCPxSPxAtxS2 - 16.0*PxCPxSxAtxCPxSxSSP - 32.0*Delta1p*PxCPxSxAtxSxSP + AtxS2*Delta2p*PxSINP + 3.0*Delta1*Delta2p*PxSINP - 16.0*Delta1*PxSP2xSSP - 16.0*PxSP2xSSPxAtxS2 - 8.0*AtxS2*PxSSP + 16.0*PxSSPxAtxS2 - 8.0*PxSSP*S2xSP2 - 32*Delta1p*PxCPxS*SxSP + 8.0*PxSSP*SxSP*SxSP + 8.0*PxSSP*SxSPxAtxSxSP)/(32.*Delta12*Delta2p*P2))-((8.0*CCxS2xSS2xAtxS2 + 8.0*CCxS2xSS2*Delta1 - 8.0*Delta1*Delta2 + 48.0*Delta12*Delta2 + 3*Delta1*Delta22 - 12.0*Delta12*Delta2*S2 + 4.0*Delta2*S2xAtxS2 - 12*Delta1*Delta2*S2xAtxS2 - 8.0*Delta1*S2xSS2 + 24.0*Delta12*S2xSS2 - 2*Delta2*S2xSS2 + 8.0*S2xAtxS2*S2xSS2 + 16.0*S2xSS2xAtxS2 + 16.0*Delta1*S2xSS2xAtxS2 - 4.0*S2xSS2xAtxSS2 + 4.0*Delta1*SS2 + 4.0*Delta12*SS2 + 2*Delta2*SS2 - 7*Delta1*Delta2*SS2 - 8.0*Delta12*S2*SS2 - 4.0*S2xAtxS2*SS2 - 8.0*Delta1*S2xAtxS2*SS2 + 2*S2xSS2*SS2 - SS2*SS2 - 2*Delta1*SS2*SS2 + AtxS2*(Delta2*(-4.0 + 12.0*Delta1 + Delta2) - 8.0*S2xSS2 + (4.0 + 8.0*Delta1)*SS2)- 8.0*SS2xAtxS2 - 16.0*Delta1*SS2xAtxS2 - 2*Delta2*SS2xAtxS2 + 2*SS2xAtxSS2 + 4.0*Delta1*SS2xAtxSS2)/(32.*Delta12*Delta22))));
-  // fprintf(file,"%d \t 3 %lf\n",jj,Fac*(((Delta1*Delta2p*PxSINP + 8.0*PxSSP*S2xSP2 + 32*Delta1p*PxCPxS*SxSP - 8.0*PxSSP*SxSP*SxSP)/(32.*Delta12*Delta2p*P2))-((Delta1*Delta2*(8.0 + Delta2 - 4.0*Delta1*(3 + S2)) + S2xSS2*(8.0*Delta1 + 8.0*Delta12 + 2.0*Delta2 - 2.0*SS2) - (Delta1*(4.0 - 3.0*Delta2) + 2.0*Delta2 + 4.0*Delta12*(3 + 2*S2))*SS2 + (1 + 2*Delta1)*SS2*SS2)/(32.*Delta12*Delta22))));
-  // fprintf(file,"%d \t 4 %lf\n",jj,Fac*(((4.0*Delta1*Delta1p*PxCxCPxSS + 4.0*Delta1p*PxCxCPxSSxAtxS2 + 2*CxSPxSSPxAtxS2*PxSS + 2*CxSPxSSP*Delta1*PxSS - 4.0*CxCPxAtxS2*Delta1p*PxSS - 4.0*CxCP*Delta1*Delta1p*PxSS - 2.0*Delta1p*PxSSxAtxCPxSxSS - 2.0*Delta1*PxCxSP*SSxSSP - 2.0*PxCxSPxAtxS2*SSxSSP + PxSSxAtxSxSP*SSxSSP - PxSS*SSxSSPxAtxSxSP)/(8.*Delta12*Delta2p*P2))-((8.0*CCxS2xSS2xAtxS2*Delta1 + 8.0*CCxS2xSS2*Delta12-48.0*Delta12*S2xSS2-4.0*Delta1*Delta2*S2xSS2+32*Delta12*S2*S2xSS2+16.0*Delta1*S2xAtxS2*S2xSS2+16.0*Delta1*S2xSS2xAtxS2+16.0*Delta12*S2xSS2xAtxS2-4.0*Delta2*S2xSS2xAtxS2-4.0*Delta1*S2xSS2xAtxSS2+24.0*Delta12*SS2-12*Delta1*Delta2*SS2+4.0*Delta12*Delta2*SS2+40*Delta12*S2*SS2-16.0*Delta12*S2*S2*SS2-8.0*Delta1*S2xAtxS2*SS2-16.0*Delta12*S2xAtxS2*SS2+4.0*Delta2*S2xAtxS2*SS2-4.0*AtxS2*(4.0*Delta1*S2xSS2+(-2*Delta1-4.0*Delta12+Delta2)*SS2)-8.0*Delta1*SS2xAtxS2-16.0*Delta12*SS2xAtxS2+4.0*Delta2*SS2xAtxS2+2*Delta1*SS2xAtxSS2+4.0*Delta12*SS2xAtxSS2-Delta2*SS2xAtxSS2)/(32.*Delta12*Delta22))));
-  // fprintf(file,"%d \t 5 %lf\n",jj,Fac*(((-8.0*Delta1*PxS2xSSP*SS2 - 8.0*PxS2xSSPxAtxS2*SS2 + 8.0*PxSSPxAtxS2*SS2 - 2.0*PxSSxAtxSSxSSP*SS2 - PxSSP*(4.0*Delta1*S2xSS2 + 4.0*S2xSS2xAtxS2 + 4.0*AtxS2*SS2 + 4.0*Delta1*SS2 - 4.0*Delta12*SS2 - 4.0*S2xAtxS2*SS2 - 4.0*SS2xAtxS2 + SS2xAtxSS2) + 8.0*Delta1*PxS2xSS*SSxSSP + 8.0*PxS2xSSxAtxS2*SSxSSP - 8.0*PxSSxAtxS2*SSxSSP + 2.0*PxSSxAtxSS2*SSxSSP + 2.0*PxSS*(4.0*Delta1*S2xSSxSSP + 4.0*S2xSSxSSPxAtxS2 + 4.0*AtxS2*SSxSSP + 8.0*Delta1*SSxSSP - 4.0*Delta12*SSxSSP - 4.0*S2xAtxS2*SSxSSP - 4.0*SSxSSPxAtxS2 + SSxSSPxAtxSS2))/(64.*Delta12*Delta2p*P2))-((8.0*CCxS2xSS2xAtxS2*Delta2 + 8.0*CCxS2xSS2*Delta1*Delta2+8.0*Delta1*S2xSS2*S2xSS2-4.0*Delta2*S2xSS2xAtxSS2+4.0*AtxS2*Delta1*Delta2*SS2+12*Delta12*Delta2*SS2-4.0*Delta12*Delta2*S2*SS2-4.0*Delta1*Delta2*S2xAtxS2*SS2-4.0*AtxS2*SS2*SS2-12*Delta1*SS2*SS2-8.0*AtxS2*Delta1*SS2*SS2-20*Delta12*SS2*SS2-2*Delta1*Delta2*SS2*SS2+8.0*Delta12*S2*SS2*SS2+4.0*S2xAtxS2*SS2*SS2+8.0*Delta1*S2xAtxS2*SS2*SS2-4.0*S2xSS2xAtxS2*(-((2.0+Delta1)*Delta2)+SS2+2.0*Delta1*SS2)-4.0*Delta1*Delta2*SS2xAtxS2+4.0*SS2*SS2xAtxS2+8.0*Delta1*SS2*SS2xAtxS2-2*Delta2*SS2*SS2xAtxS2+Delta1*Delta2*SS2xAtxSS2-SS2*SS2xAtxSS2-2*Delta1*SS2*SS2xAtxSS2+2*S2xSS2*(-4.0*AtxS2*Delta2-12*Delta1*Delta2+6.0*Delta12*Delta2+4.0*Delta2*S2xAtxS2+4.0*S2xSS2xAtxS2+4.0*AtxS2*SS2+10*Delta1*SS2-8.0*Delta12*SS2-4.0*S2xAtxS2*SS2-4.0*SS2xAtxS2+SS2xAtxSS2))/(128.*Delta12*Delta22))));
-
 }
 
 
@@ -353,9 +330,10 @@ int main(int narg,char **arg)
   FILE *file;
   file = fopen (path.c_str(),"w");
 
-  vd_t Int(0.0,12), IntS(0.0,10);
+  double Int[12]={0.0};
+  double IntS[10]={0.0};
 
-  #pragma omp parallel for reduction(vd_t_plus:Int,IntS)
+#pragma omp parallel for reduction(+:Int,IntS)
   for(int i=0;i<L*L*L*T;i++)
   {
     intComp(Int,IntS,i,file);
