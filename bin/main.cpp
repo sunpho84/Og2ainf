@@ -318,7 +318,7 @@ int main(int narg,char **arg)
     ss2_v[l]  = ss_v[l]*ss_v[l];
   }
 
-  find_eqmoms();
+  // find_eqmoms();
 
   /* External momentum   --->  va in un loop */
   array<double,4> np = {0.0, 4.0, 5.0, 6.0};

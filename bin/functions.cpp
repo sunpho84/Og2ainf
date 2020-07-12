@@ -11,7 +11,7 @@
 #include "global.hpp"
 #include "aliases.hpp"
 
-using namespace Eigen;
+// using namespace Eigen;
 using namespace std;
 
 

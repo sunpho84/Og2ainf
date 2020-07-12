@@ -1,10 +1,10 @@
 /* bin/config.hpp.in.  Generated from configure.ac by autoheader.  */
 
+/* Disable intriniscs */
+#undef DISABLE_X86_INTRINSICS
+
 /* define if the compiler supports basic C++11 syntax */
 #undef HAVE_CXX11
-
-/* Define to 1 if you have the <Eigen/Dense> header file. */
-#undef HAVE_EIGEN_DENSE
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
@@ -51,8 +51,8 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* Instruction set to be used */
+#undef SIMD_INST_SET
+
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
-
-/* Enable Eigen */
-#undef USE_EIGEN

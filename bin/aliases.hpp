@@ -17,7 +17,7 @@
 #include <tuple>
 
 using namespace std;
-using namespace Eigen;
+//using namespace Eigen;
 
 // //coordinates in the lattice
 // using coords_t=array<int,4>;

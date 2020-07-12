@@ -1,7 +1,7 @@
 #ifndef GLOBAL_HPP
 #define GLOBAL_HPP
 
-#include <Eigen/Dense>
+// #include <Eigen/Dense>
 #include <valarray>
 #include <complex>
 #include <array>
@@ -9,7 +9,7 @@
 #include <vector>
 
 using namespace std;
-using namespace Eigen;
+// using namespace Eigen;
 
 /* Volume */
 extern int L;

@@ -2,6 +2,8 @@
 #include "read_input.hpp"
 #include "aliases.hpp"
 #include "global.hpp"
+
+#include <cstring>
 // #include "operations.hpp"
 // #include "read.hpp"
 
