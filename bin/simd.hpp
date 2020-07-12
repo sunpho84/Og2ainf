@@ -6,7 +6,7 @@
 #include <immintrin.h>
 
 #define MMX 2
-#define ACX 4
+#define AVX 4
 #define AVX512 8
 
 #if SIMD_INST_SET == AVX512
