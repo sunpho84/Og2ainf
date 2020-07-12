@@ -1,8 +1,10 @@
 #ifndef FUNC_HPP
 #define FUNC_HPP
 
+#include "simd.hpp"
+#include <array>
 
-using namespace Eigen;
+// using namespace Eigen;
 using namespace std;
 
 template <typename T>
@@ -22,8 +24,11 @@ inline array<array<T,4>,4> make_propagator(array<T,4> kt2_dir, array<T,4> kt4_di
   for(int mu=0; mu<4; mu++)
     for(int nu=0; nu<4; nu++){
 
-      ktpo2[mu][nu]=1.0;
-      ktso2[mu][nu]=0.0;
+      for(int x=0;x<sizeof(T)/sizeof(double);x++)
+      {
+        ktpo2[mu][nu][x]=1.0;
+        ktso2[mu][nu][x]=0.0;
+      }
 
       for(int rho=0;rho<4;rho++){
         if(mu!=rho && nu!=rho)
