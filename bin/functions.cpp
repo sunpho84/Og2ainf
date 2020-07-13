@@ -119,7 +119,7 @@ void find_eqmoms(){
         fabs(norm3(ap_list[j])-norm3(ap_list[imom]))<eps*(norm3(ap_list[j])+norm3(ap_list[imom]))
       };
 
-      cond = false;
+      // cond = false;  /*test*/
 
       if(cond)  tag_aux = tag_list[j];
       else      count_no++;
