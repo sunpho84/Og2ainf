@@ -5,13 +5,14 @@
 #include <math.h>
 #include <array>
 #include <vector>
+#include <fstream>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include "global.hpp"
-#include "aliases.hpp"
+// #include "aliases.hpp"
 
-using namespace Eigen;
+// using namespace Eigen;
 using namespace std;
 
 
@@ -63,4 +64,75 @@ vector<double> compute_Z(double *Int, double *IntS)
     Z[i+1] = Z[0] - V[i]*as;
   }
   return Z;
+}
+
+inline double norm3(const array<double,4>& mom)
+{
+  return mom[0]*mom[0]+mom[1]*mom[1]+mom[2]*mom[2];
+}
+
+void find_eqmoms(){
+
+  array<double,4> shift={0.0,0.0,0.0,0.0};
+  if(APBC) shift[0]+=0.5;
+
+  ifstream input("mom_list.txt");
+  if(!input.good())
+  {
+    cerr<<"Error opening \"mom_list.txt\"."<<endl;
+    exit(1);
+  }
+
+  while(!input.eof())
+  {
+    array<double,4> np,ap;
+    /* np = {T,L0,L1,L2} */
+    /* ap = {L0,L1,L2,T} */
+
+    for(int mu=0;mu<4;mu++){
+      input>>np[mu];
+      ap[(mu+3)%4] = 2.0*M_PI*(np[mu]+shift[mu])/V[(mu+3)%4];
+    }
+    if(input.good())
+    {
+      ap_list.push_back(ap);
+    }
+  }
+
+  // Find equivalent moms
+  ap_eq.push_back(ap_list[0]);
+  tag_list.push_back(0);
+
+  moms=ap_list.size();
+  int tag=0, tag_aux=0;
+  double eps=1.0e-15;
+
+  for(int imom=0; imom<moms; imom++)
+  {
+    int count_no = 0;
+
+    for(int j=0;j<imom;j++)
+    {
+      /* H(3,1) condition */
+      bool cond{
+        fabs(fabs(ap_list[j][3])-fabs(ap_list[imom][3]))<eps*(fabs(ap_list[j][3])+fabs(ap_list[imom][3])) &&
+        fabs(norm3(ap_list[j])-norm3(ap_list[imom]))<eps*(norm3(ap_list[j])+norm3(ap_list[imom]))
+      };
+
+      if(cond)  tag_aux = tag_list[j];
+      else      count_no++;
+
+      if(count_no==imom)
+      {
+          tag++;
+          tag_list.push_back(tag);
+          ap_eq.push_back(ap_list[j]);
+      }
+      else if(j==imom-1)
+      {
+        tag_list.push_back(tag_aux);
+      }
+    }
+  }
+  eqmoms = tag+1;
 }
