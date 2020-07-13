@@ -324,6 +324,8 @@ int main(int narg,char **arg)
 
   for(int imom=0; imom<eqmoms; imom++)
   {
+    cout<<"\r"<<imom+1<<"/"<<eqmoms<<flush;
+
     array<double,4> ap = ap_eq[imom];
 
     P2 = norm4(ap);
