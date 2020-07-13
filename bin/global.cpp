@@ -2,7 +2,7 @@
 #include "global.hpp"
 
 using namespace std;
-using namespace Eigen;
+// using namespace Eigen;
 
 /* Volume */
 int L;
@@ -23,9 +23,15 @@ double beta;
 int action;
 
 /* External momentum */
-array<double,4> np;
-array<double,4> ap;
+// array<double,4> np;
+// array<double,4> ap;
 double Np0;
+
+vector<array<double,4>> ap_list;
+vector<array<double,4>> ap_eq;
+vector<int> tag_list;
+int moms;
+int eqmoms;
 
 /* Loop momentum */
 double al;

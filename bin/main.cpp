@@ -10,6 +10,7 @@
 #include <array>
 #include <vector>
 #include <numeric>
+#include <fstream>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -38,15 +39,15 @@ void intComp(std::array<F,12>& Int,std::array<F,10>& IntS,std::array<int,N> i)
 {
   std::array<int,N> i4,i3,i2,i1;
   for(int j=0;j<N;j++)
-    {
-      i4[j]=i[j]%T;
-      i[j]/=T;
-      i3[j]=i[j]%L;
-      i[j]/=L;
-      i2[j]=i[j]%L;
-      i[j]/=L;
-      i1[j]=i[j];
-    }
+  {
+    i4[j]=i[j]%T;
+    i[j]/=T;
+    i3[j]=i[j]%L;
+    i[j]/=L;
+    i2[j]=i[j]%L;
+    i[j]/=L;
+    i1[j]=i[j];
+  }
 
   array<F,4> kt2, kt4, kt6;
   array<F,4> s,ss,s2,ss2,c,cc;
@@ -67,12 +68,12 @@ void intComp(std::array<F,12>& Int,std::array<F,10>& IntS,std::array<int,N> i)
     Fac[x] = j[i1[x]]*j[i2[x]]*j[i3[x]]*j[i4[x]+L]*16.0*M_PI*M_PI/((double)(L*L*L*T));
 
     auto fill=[x,i1,i2,i3,i4](array<F,4>& kt,const vector<double>& kt_v)
-		{
-		  kt[0][x] = kt_v[i1[x]];
-		  kt[1][x] = kt_v[i2[x]];
-		  kt[2][x] = kt_v[i3[x]];
-		  kt[3][x] = kt_v[i4[x]+L];
-		};
+    {
+      kt[0][x] = kt_v[i1[x]];
+      kt[1][x] = kt_v[i2[x]];
+      kt[2][x] = kt_v[i3[x]];
+      kt[3][x] = kt_v[i4[x]+L];
+    };
     fill(kt2,kt2_v);
     fill(kt4,kt4_v);
     fill(kt6,kt6_v);
@@ -84,12 +85,12 @@ void intComp(std::array<F,12>& Int,std::array<F,10>& IntS,std::array<int,N> i)
     fill(cc,cc_v);
 
     auto fill3=[x,i1,i2,i3,i4](array<F,4>& t,const vector<double>& t_v)
-		{
-		  t[0][x] = t_v[i1[x]];
-		  t[1][x] = t_v[i2[x]+L];
-		  t[2][x] = t_v[i3[x]+2*L];
-		  t[3][x] = t_v[i4[x]+3*L];
-		};
+    {
+      t[0][x] = t_v[i1[x]];
+      t[1][x] = t_v[i2[x]+L];
+      t[2][x] = t_v[i3[x]+2*L];
+      t[3][x] = t_v[i4[x]+3*L];
+    };
     fill3(sp,sp_v);
     fill3(cp,cp_v);
     fill3(sp2,sp2_v);
@@ -97,8 +98,8 @@ void intComp(std::array<F,12>& Int,std::array<F,10>& IntS,std::array<int,N> i)
     fill3(ssp,ssp_v);
     fill3(ssp2,ssp2_v);
 
-  A = make_propagator(kt2,kt4,kt6);
-}
+    A = make_propagator(kt2,kt4,kt6);
+  }
 
   // asm("#CIAO!");
 
@@ -241,8 +242,6 @@ void intComp(std::array<F,12>& Int,std::array<F,10>& IntS,std::array<int,N> i)
   // IntS[8]  = 0.0;
   // IntS[9]  = 0.0;
 
-  // printf("%lf, %lf, %lf, %lf, %lf, %lf\n",c0[0],c1[0],c2[0],c3[0],c4[0],c5[0]);
-  // printf("%lf, %lf, %lf, %lf, %lf, %lf\n",c6[0],c7[0],c8[0],c9[0],c10[0],c11[0]);
 }
 
 
@@ -320,111 +319,122 @@ int main(int narg,char **arg)
 
   find_eqmoms();
 
-  /* External momentum   --->  va in un loop */
-  array<double,4> np = {0.0, 4.0, 5.0, 6.0};
-  if(APBC) np[3] += 0.5;
+  // Compute RC corrections for independent external momenta
+  vector<vector<double>> DeltaZ_moms;
 
-  array<double,4> ap;
-  P2 = 0.0;
-  Np0 = 4.0;
-
-  for(int mu=0; mu<4; mu++){
-    ap[mu] = 2.0*M_PI*np[mu]/V[mu];
-    P2 += ap[mu]*ap[mu];
-    if(np[mu]==0.0) Np0 -= 1.0;
-  }
-  PxSINP = P2;
-
-  double eps=1.0e-14;
-  for(int i=0; i<4; i++)
+  for(int imom=0; imom<eqmoms; imom++)
   {
-    if(fabs(sin(ap[i]))>eps) p[i] = P2/Np0/sin(ap[i]);
-    else p[i] = 0.0;
-  }
+    array<double,4> ap = ap_eq[imom];
 
-  int L3T = 3*L+T;
-  kn.resize(L3T);
-  kp.resize(L3T);
-  sp_v.resize(L3T);
-  cp_v.resize(L3T);
-  sp2_v.resize(L3T);
-  sq2_v.resize(L3T);
-  ssp_v.resize(L3T);
-  ssp2_v.resize(L3T);
+    P2 = norm4(ap);
+    PxSINP = P2;
+    Np0 = 4.0 - count(ap.begin(), ap.end(), 0.0);
 
-  #pragma omp parallel for
-  for(int j=0; j<L3T; j++)
-  {
-    int q = (j>=L)+(j>=2*L);
-    int p = q+(j>=3*L);
-    int l = j-q*L;
+    double eps=1.0e-14;
+    for(int mu=0; mu<4; mu++)
+    {
+      if(fabs(sin(ap[mu]))>eps) p[mu] = P2/Np0/sin(ap[mu]);
+      else p[mu] = 0.0;
+    }
 
-    kn[j] = k[l] + 2.0*ap[p];
-    kp[j] = k[l] + ap[p];
+    int L3T = 3*L+T;
+    kn.resize(L3T);
+    kp.resize(L3T);
+    sp_v.resize(L3T);
+    cp_v.resize(L3T);
+    sp2_v.resize(L3T);
+    sq2_v.resize(L3T);
+    ssp_v.resize(L3T);
+    ssp2_v.resize(L3T);
 
-    sp_v[j]   = sin(kn[j]/2.0);
-    cp_v[j]   = cos(kn[j]/2.0);
+    #pragma omp parallel for
+    for(int j=0; j<L3T; j++)
+    {
+      int q = (j>=L)+(j>=2*L);
+      int p = q+(j>=3*L);
+      int l = j-q*L;
 
-    sp2_v[j]  = sp_v[j]*sp_v[j];
-    sq2_v[j]  = pow(sin(kp[j]/2.0),2.0);
+      kn[j] = k[l] + 2.0*ap[p];
+      kp[j] = k[l] + ap[p];
 
-    ssp_v[j]  = sin(kp[j]);
-    ssp2_v[j] = ssp_v[j]*ssp_v[j];
-  }
+      sp_v[j]   = sin(kn[j]/2.0);
+      cp_v[j]   = cos(kn[j]/2.0);
 
-  double Int[12]={0.0};
-  double IntS[10]={0.0};
+      sp2_v[j]  = sp_v[j]*sp_v[j];
+      sq2_v[j]  = pow(sin(kp[j]/2.0),2.0);
 
-  if(L*L*L*T%N!=0)
+      ssp_v[j]  = sin(kp[j]);
+      ssp2_v[j] = ssp_v[j]*ssp_v[j];
+    }
+
+    double Int[12]={0.0};
+    double IntS[10]={0.0};
+
+    if(L*L*L*T%N!=0)
     {
       cerr<<"Volume = "<<L*L*L*T<<" not divisible by SIMD size "<<N<<endl;
       exit(0);
     }
 
-#pragma omp parallel for reduction(+:Int,IntS)
-// #pragma omp parallel for
-  for(int i=0;i<L*L*L*T/N;i++)
-  {
-    std::array<vtype,12> IntV;
-    std::array<vtype,10> IntSV;
+    #pragma omp parallel for reduction(+:Int,IntS)
+    // #pragma omp parallel for
+    for(int i=0;i<L*L*L*T/N;i++)
+    {
+      std::array<vtype,12> IntV;
+      std::array<vtype,10> IntSV;
 
-    std::array<int,N> u;
-    for(int j=0;j<N;j++) u[j]=i*N+j;
+      std::array<int,N> u;
+      for(int j=0;j<N;j++) u[j]=i*N+j;
 
-    intComp(IntV,IntSV,u);
+      intComp(IntV,IntSV,u);
 
-    for(int j=0;j<N;j++)
+      for(int j=0;j<N;j++)
       {
-      	for(int o=0;o<12;o++) Int[o]+=IntV[o][j];
-      	for(int o=0;o<10;o++) IntS[o]+=IntSV[o][j];
+        for(int o=0;o<12;o++) Int[o]+=IntV[o][j];
+        for(int o=0;o<10;o++) IntS[o]+=IntSV[o][j];
       }
+    }
+
+    Int[0] -= (7.0 + M_PI*M_PI*(44.0*Z0 - 6.0))/6.0;
+    Int[1] -= 4.0/3.0 - EulerGamma + F0 - log(P2) + M_PI*M_PI - 28.0*Z0*M_PI*M_PI/3.0;
+
+    IntS[0] -= 2.0*(-1.0 + M_PI*M_PI*(-3.0+22.0*Z0))/3.0;
+    IntS[1] -= -4.0/3.0 + EulerGamma - F0 + log(P2) + 2.0*M_PI*M_PI - 38.0*M_PI*M_PI*Z0/3.0;
+
+    // printf("--- INTEGRALS -------------------- \n");
+    // printf("i \t IntV \t \t IntV(a=0)\n");
+    // printf("---------------------------------- \n");
+    // for(int i=0; i<12; i++)
+    // {
+    //   printf("%d \t %lf",i,Int[i]);
+    //   if(i<10) printf(" \t %lf\n",IntS[i]);
+    //   else printf("\n");
+    // }
+
+    // string RCs[6] = {"q","S","P","V","A","T"};
+    vector<double> DeltaZ = compute_Z(Int,IntS);
+
+    // printf("--- CORRECTIONS O(g2ainf) -- \n");
+    // printf("i \t DeltaZ\n");
+    // printf("---------------------------- \n");
+    // for(int i=0; i<6; i++)
+    // {
+    //   printf("%s \t %lf\n",RCs[i].c_str(),DeltaZ[i]);
+    // }
+
+    DeltaZ_moms.push_back(DeltaZ);
   }
 
-  Int[0] -= (7.0 + M_PI*M_PI*(44.0*Z0 - 6.0))/6.0;
-  Int[1] -= 4.0/3.0 - EulerGamma + F0 - log(P2) + M_PI*M_PI - 28.0*Z0*M_PI*M_PI/3.0;
-
-  IntS[0] -= 2.0*(-1.0 + M_PI*M_PI*(-3.0+22.0*Z0))/3.0;
-  IntS[1] -= -4.0/3.0 + EulerGamma - F0 + log(P2) + 2.0*M_PI*M_PI - 38.0*M_PI*M_PI*Z0/3.0;
-
-  printf("--- INTEGRALS -------------------- \n");
-  printf("i \t IntV \t \t IntV(a=0)\n");
-  printf("---------------------------------- \n");
-  for(int i=0; i<12; i++)
-  {
-    printf("%d \t %lf",i,Int[i]);
-    if(i<10) printf(" \t %lf\n",IntS[i]);
-    else printf("\n");
-  }
-
+  vector<ofstream> DeltaZ_file(6);
   string RCs[6] = {"q","S","P","V","A","T"};
-  vector<double> DeltaZ = compute_Z(Int,IntS);
-
-  printf("--- CORRECTIONS O(g2ainf) -- \n");
-  printf("i \t DeltaZ\n");
-  printf("---------------------------- \n");
-  for(int i=0; i<6; i++)
+  for(int iRC=0;iRC<6;iRC++)
   {
-    printf("%s \t %lf\n",RCs[i].c_str(),DeltaZ[i]);
+    DeltaZ_file[iRC].open("DeltaZ"+RCs[iRC]);
+
+    for(int imom=0; imom<moms; imom++)
+    {
+      DeltaZ_file[iRC]<<DeltaZ_moms[tag_list[imom]][iRC]<<endl;
+    }
   }
 
   exit(0);

@@ -5,16 +5,17 @@
 
 #include <immintrin.h>
 
-// passabile da configure.ac, eventualmente
-#define USE_AVX
+#define MMX 2
+#define AVX 4
+#define AVX512 8
 
-#if defined USE_AVX512
+#if SIMD_INST_SET == AVX512
 using vtype=__m512d;
 constexpr int N=8;
-#elif defined USE_AVX
+#elif SIMD_INST_SET == AVX
 using vtype=__m256d;
 constexpr int N=4;
-#elif defined USE_MMX
+#elif SIMD_INST_SET == MMX
 using vtype=__m128d;
 constexpr int N=2;
 #else

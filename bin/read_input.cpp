@@ -2,8 +2,6 @@
 #include "read_input.hpp"
 #include "aliases.hpp"
 #include "global.hpp"
-// #include "operations.hpp"
-// #include "read.hpp"
 
 #define DEFAULT_STR_VAL "null"
 #define DEFAULT_INT_VAL -1

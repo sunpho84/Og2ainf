@@ -19,23 +19,61 @@ AM_SILENT_RULES([yes])
 AX_CXX_COMPILE_STDCXX_11(noext,mandatory)
 AX_CXXFLAGS_WARN_ALL
 
-#add Eigen path, search it and enable
-AC_ARG_WITH(eigen,
-	AS_HELP_STRING([--with-eigen],[Specify where to find Eigen/Dense]),
-	with_eigen=${withval}
-	CPPFLAGS="$CPPFLAGS -I$with_eigen",
-	with_eigen=no)
-AC_MSG_RESULT([with Eigen... ${with_eigen}])
-AC_LANG_PUSH([C++])
-AC_CHECK_HEADERS([Eigen/Dense])
-AC_LANG_POP([C++])
-if test "$ac_cv_header_Eigen_Dense" == "no"
+dnl #add Eigen path, search it and enable
+dnl AC_ARG_WITH(eigen,
+dnl 	AS_HELP_STRING([--with-eigen],[Specify where to find Eigen/Dense]),
+dnl 	with_eigen=${withval}
+dnl 	CPPFLAGS="$CPPFLAGS -I$with_eigen",
+dnl 	with_eigen=no)
+dnl AC_MSG_RESULT([with Eigen... ${with_eigen}])
+dnl AC_LANG_PUSH([C++])
+dnl AC_CHECK_HEADERS([Eigen/Dense])
+dnl AC_LANG_POP([C++])
+dnl if test "$ac_cv_header_Eigen_Dense" == "no"
+dnl then
+dnl 	AC_MSG_ERROR(["Unable to find Eigen"])
+dnl else
+dnl 	AC_DEFINE_UNQUOTED([USE_EIGEN],[1],[Enable Eigen])
+dnl fi
+dnl AC_MSG_RESULT(enabling Eigen ... ${enable_eigen})
+
+#check immintrin.h
+AC_CHECK_HEADER(immintrin.h,
+	simd_inst_set_default=avx,
+	simd_inst_set_default=none
+	AC_DEFINE_UNQUOTED([DISABLE_X86_INTRINSICS],1,[Disable intriniscs]))
+
+#simd set to be used
+AC_ARG_WITH(simd-inst-set,
+	AS_HELP_STRING([--with-simd-inst-set=set],[Select the set of SIMD instruction (avx [default if possible], none [otherwise], mmx or avx512)]),
+	with_simd_inst_set="${withval}",
+	with_simd_inst_set=avx)
+case "$with_simd_inst_set" in
+     none) CPPFLAGS_SIMD=""
+     	  SIMD_INST_SET=NONE;;
+     mmx) CPPFLAGS_SIMD="-mmmx"
+     	  SIMD_INST_SET=MMX;;
+     avx) CPPFLAGS_SIMD="-mavx"
+     	  SIMD_INST_SET=AVX;;
+     avx512) CPPFLAGS_SIMD="-mavx512f"
+     	  SIMD_INST_SET=AVX512;;
+      *) AC_MSG_ERROR(["Unkwnown SIMD instruction set ${withval}"])
+esac
+
+#check that we asked simd type only if available
+if test SIMD_INST_SET != NONE && test "$ac_cv_header_immintrin_h" == ""
 then
-	AC_MSG_ERROR(["Unable to find Eigen"])
-else
-	AC_DEFINE_UNQUOTED([USE_EIGEN],[1],[Enable Eigen])
+	AC_MSG_ERROR(["Cannot use simd type if immintrin.h is not found"])
 fi
-AC_MSG_RESULT(enabling Eigen ... ${enable_eigen})
+
+if test "$CPPFLAGS_SIMD" != ""
+then
+	CPPFLAGS="$CPPFLAGS_SIMD -mfma $CPPFLAGS"
+fi
+
+AC_MSG_RESULT(with SIMD insttruction set ... ${with_simd_inst_set})
+AC_DEFINE_UNQUOTED([SIMD_INST_SET],[$SIMD_INST_SET],[Instruction set to be used])
+
 
 #openMP
 AC_OPENMP

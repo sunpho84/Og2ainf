@@ -57,6 +57,11 @@ inline array<array<T,4>,4> make_propagator(array<T,4> kt2_dir, array<T,4> kt4_di
 
 vector<double> compute_Z(double *Int, double *IntS);
 
+inline double norm4(const array<double,4>& mom)
+{
+  return mom[0]*mom[0]+mom[1]*mom[1]+mom[2]*mom[2]+mom[3]*mom[3];
+}
 
+void find_eqmoms();
 
 #endif
