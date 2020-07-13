@@ -1,5 +1,5 @@
 #include <iostream>
-#include <cstring>
+#include <string>
 #include "read_input.hpp"
 #include "aliases.hpp"
 #include "global.hpp"
