@@ -5,7 +5,6 @@
 #include <valarray>
 #include <complex>
 #include <array>
-#include <array>
 #include <vector>
 
 using namespace std;
