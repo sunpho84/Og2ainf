@@ -119,7 +119,8 @@ void find_eqmoms(){
         fabs(norm3(ap_list[j])-norm3(ap_list[imom]))<eps*(norm3(ap_list[j])+norm3(ap_list[imom]))
       };
 
-      // cond = false;  /*test*/
+      /* identity condition */
+      // bool cond{ap_list[j][0]==ap_list[imom][0] && ap_list[j][1]==ap_list[imom][1] && ap_list[j][2]==ap_list[imom][2] && ap_list[j][3]==ap_list[imom][3]};  /*test*/
 
       if(cond)  tag_aux = tag_list[j];
       else      count_no++;
@@ -128,7 +129,7 @@ void find_eqmoms(){
       {
           tag++;
           tag_list.push_back(tag);
-          ap_eq.push_back(ap_list[j]);
+          ap_eq.push_back(ap_list[imom]);
       }
       else if(j==imom-1)
       {
@@ -136,5 +137,5 @@ void find_eqmoms(){
       }
     }
   }
-  eqmoms = tag+1;
+  eqmoms = ap_eq.size();
 }
