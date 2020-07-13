@@ -111,8 +111,6 @@ void check_double_par(const double val,const char *name)
 // reads the input file
 void read_input_glb(const char path[])
 {
-    printf("a\n");
-
     FILE *fin=fopen(path,"r");
     if(not fin)
     {
@@ -128,8 +126,6 @@ void read_input_glb(const char path[])
     alpha  = DEFAULT_DOUBLE_VAL;
     r      = DEFAULT_DOUBLE_VAL;
     al     = DEFAULT_DOUBLE_VAL;
-
-    printf("b\n");
 
     while(not feof(fin))
     {
@@ -170,8 +166,6 @@ void read_input_glb(const char path[])
         }
     }
 
-    printf("c\n");
-
     //check initialization
     check_int_par(L, L_tag);
     check_int_par(APBC, APBC_tag);
@@ -181,9 +175,6 @@ void read_input_glb(const char path[])
     check_double_par(alpha,alpha_tag);
     check_double_par(r,r_tag);
     check_double_par(al,al_tag);
-
-    printf("d\n");
-
 
     fclose(fin);
 
