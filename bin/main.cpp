@@ -446,8 +446,8 @@ int main(int narg,char **arg)
       if(eq) ind_imom = imom;
       else   ind_imom = tag_list[imom];
       
-      DeltaG_file[iRC]<<DeltaG_moms[tag_list[imom]][iRC]<<endl;
-      DeltaZ_file[iRC]<<DeltaZ_moms[tag_list[imom]][iRC]<<endl;
+      DeltaG_file[iRC]<<DeltaG_moms[ind_imom][iRC]<<endl;
+      DeltaZ_file[iRC]<<DeltaZ_moms[ind_imom][iRC]<<endl;
     }
   }
 
