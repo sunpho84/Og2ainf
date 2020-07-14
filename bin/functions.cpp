@@ -108,7 +108,6 @@ void find_eqmoms(){
 
   moms=ap_list.size();
   int tag=0, tag_aux=0;
-  double eps=1.0e-15;
 
   array<int,4> n1,n2;
 
