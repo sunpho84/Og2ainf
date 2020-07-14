@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <algorithm>
 #include <array>
 #include <vector>
 #include <fstream>
@@ -74,7 +75,7 @@ inline double norm3(const array<double,4>& mom)
 void find_eqmoms(){
 
   array<double,4> shift={0.0,0.0,0.0,0.0};
-  if(APBC) shift[0]+=0.5;
+  if(APBC) shift[3]+=0.5;
 
   ifstream input("mom_list.txt");
   if(!input.good())
@@ -85,16 +86,18 @@ void find_eqmoms(){
 
   while(!input.eof())
   {
-    array<double,4> np,ap;
-    /* np = {T,L0,L1,L2} */
-    /* ap = {L0,L1,L2,T} */
+    array<double,4> ap;
+    array<int,4> np;
 
+    /* mom_list.txt is in the order T,L,L,L */
     for(int mu=0;mu<4;mu++){
-      input>>np[mu];
-      ap[(mu+3)%4] = 2.0*M_PI*(np[mu]+shift[mu])/V[(mu+3)%4];
+      int nu = (mu+3)%4; /* 3,0,1,2 */
+      input>>np[nu];
+      ap[nu] = 2.0*M_PI*(np[nu]+shift[nu])/V[nu];
     }
     if(input.good())
     {
+      np_list.push_back(np);
       ap_list.push_back(ap);
     }
   }
@@ -107,16 +110,30 @@ void find_eqmoms(){
   int tag=0, tag_aux=0;
   double eps=1.0e-15;
 
+  array<int,4> n1,n2;
+
   for(int imom=0; imom<moms; imom++)
   {
     int count_no = 0;
 
     for(int j=0;j<imom;j++)
     {
+      n1 = np_list[j];
+      n2 = np_list[imom];
+
+      for(int i=0;i<3;i++)
+      {
+        n1[i]=abs(n1[i]);
+        n2[i]=abs(n2[i]);
+      }
+
+      sort(n1.begin(),n1.end()-1);
+      sort(n2.begin(),n2.end()-1);
+
       /* H(3,1) condition */
       bool cond{
-        fabs(fabs(ap_list[j][3])-fabs(ap_list[imom][3]))<eps*(fabs(ap_list[j][3])+fabs(ap_list[imom][3])) &&
-        fabs(norm3(ap_list[j])-norm3(ap_list[imom]))<eps*(norm3(ap_list[j])+norm3(ap_list[imom]))
+        n1[0]==n2[0] && n1[1]==n2[1] && n1[2]==n2[2] &&
+        (n1[3]==n2[3] || n1[3]+1==-n2[3])
       };
 
       /* identity condition */

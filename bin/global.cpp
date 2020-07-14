@@ -27,6 +27,7 @@ int action;
 // array<double,4> ap;
 double Np0;
 
+vector<array<int,4>> np_list;
 vector<array<double,4>> ap_list;
 vector<array<double,4>> ap_eq;
 vector<int> tag_list;

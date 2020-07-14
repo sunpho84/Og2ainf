@@ -33,6 +33,7 @@ extern int action;
 // extern array<double,4> ap;
 extern double Np0;
 
+extern vector<array<int,4>> np_list;
 extern vector<array<double,4>> ap_list;
 extern vector<array<double,4>> ap_eq;
 extern vector<int> tag_list;
