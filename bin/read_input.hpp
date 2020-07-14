@@ -16,7 +16,7 @@ const char csw_tag[]="Csw";
 const char alpha_tag[]="Alpha";
 const char r_tag[]="R";
 const char al_tag[]="al";
-const char eq_tag[]="OnlyEqmoms"
+const char eq_tag[]="OnlyEqmoms";
 
 // parse the value string
 template <class T>
