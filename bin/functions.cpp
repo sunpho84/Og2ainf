@@ -49,6 +49,7 @@ double compute_S(double *Int)
   return S ;
 }
 
+
 vector<double> compute_Z(double *Int, double *IntS)
 {
   vector<double> Z(6);
@@ -56,8 +57,9 @@ vector<double> compute_Z(double *Int, double *IntS)
   vector<double> V=compute_V(Int);
   double S=compute_S(IntS);
 
-  double g02 = 6.0/beta;
-  double as = g02/(16.0*M_PI*M_PI)*4.0/3.0;
+  // double g02 = 6.0/beta;
+  // double as = g02/(16.0*M_PI*M_PI)*4.0/3.0;
+  double as = 1.0/(16.0*M_PI*M_PI);
 
   Z[0] = -S*as;
   for(int i=0; i<5; i++)
@@ -65,6 +67,25 @@ vector<double> compute_Z(double *Int, double *IntS)
     Z[i+1] = Z[0] - V[i]*as;
   }
   return Z;
+}
+
+vector<double> compute_Gamma(double *Int, double *IntS)
+{
+  vector<double> G(6);
+
+  vector<double> V=compute_V(Int);
+  double S=compute_S(IntS);
+
+  // double g02 = 6.0/beta;
+  // double as = g02/(16.0*M_PI*M_PI)*4.0/3.0;
+  double as = 1.0/(16.0*M_PI*M_PI);
+
+  G[0] = -S*as;
+  for(int i=0; i<5; i++)
+  {
+    G[i+1] = V[i]*as;
+  }
+  return G;
 }
 
 inline double norm3(const array<double,4>& mom)

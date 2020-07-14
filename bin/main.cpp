@@ -320,7 +320,7 @@ int main(int narg,char **arg)
   find_eqmoms();
 
   // Compute RC corrections for independent external momenta
-  vector<vector<double>> DeltaZ_moms;
+  vector<vector<double>> DeltaZ_moms, DeltaG_moms;
 
   for(int imom=0; imom<eqmoms; imom++)
   {
@@ -415,6 +415,8 @@ int main(int narg,char **arg)
 
     // string RCs[6] = {"q","S","P","V","A","T"};
     vector<double> DeltaZ = compute_Z(Int,IntS);
+    vector<double> DeltaG = compute_Gamma(Int,IntS);
+
 
     // printf("--- CORRECTIONS O(g2ainf) -- \n");
     // printf("i \t DeltaZ\n");
@@ -425,16 +427,19 @@ int main(int narg,char **arg)
     // }
 
     DeltaZ_moms.push_back(DeltaZ);
+    DeltaG_moms.push_back(DeltaG);
   }
 
-  vector<ofstream> DeltaZ_file(6);
+  vector<ofstream>  DeltaG_file(6), DeltaZ_file(6);
   string RCs[6] = {"q","S","P","V","A","T"};
   for(int iRC=0;iRC<6;iRC++)
   {
+    DeltaG_file[iRC].open("DeltaG"+RCs[iRC]);
     DeltaZ_file[iRC].open("DeltaZ"+RCs[iRC]);
 
     for(int imom=0; imom<moms; imom++)
     {
+      DeltaG_file[iRC]<<DeltaG_moms[tag_list[imom]][iRC]<<endl;
       DeltaZ_file[iRC]<<DeltaZ_moms[tag_list[imom]][iRC]<<endl;
     }
   }
