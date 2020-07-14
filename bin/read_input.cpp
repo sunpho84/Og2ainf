@@ -36,6 +36,7 @@ TK_glb_t get_TK_glb(FILE *fin)
     if(strcasecmp(tok,alpha_tag)==0) return ALPHA_TK;
     if(strcasecmp(tok,r_tag)==0) return R_TK;
     if(strcasecmp(tok,al_tag)==0) return AL_TK;
+    if(strcasecmp(tok,eq_tag)==0) return EQ_TK;
 
     return VALUE_GLB_TK;
 }
@@ -126,6 +127,7 @@ void read_input_glb(const char path[])
     alpha  = DEFAULT_DOUBLE_VAL;
     r      = DEFAULT_DOUBLE_VAL;
     al     = DEFAULT_DOUBLE_VAL;
+    eq     = DEFAULT_INT_VAL;
 
     while(not feof(fin))
     {
@@ -160,6 +162,9 @@ void read_input_glb(const char path[])
             case AL_TK:
                 get_value_glb(fin,al);
                 break;
+            case EQ_TK:
+                get_value_glb(fin,eq);
+                break;
 
             case FEOF_GLB_TK:
                 break;
@@ -175,6 +180,7 @@ void read_input_glb(const char path[])
     check_double_par(alpha,alpha_tag);
     check_double_par(r,r_tag);
     check_double_par(al,al_tag);
+    check_int_par(eq,eq_tag);
 
     fclose(fin);
 

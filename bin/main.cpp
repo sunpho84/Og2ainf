@@ -437,8 +437,15 @@ int main(int narg,char **arg)
     DeltaG_file[iRC].open("DeltaG"+RCs[iRC]);
     DeltaZ_file[iRC].open("DeltaZ"+RCs[iRC]);
 
-    for(int imom=0; imom<moms; imom++)
+    int moms_max, ind_imom;
+    if(eq) moms_max=eqmoms;  /* only eqmoms*/
+    else   moms_max=moms;
+
+    for(int imom=0; imom<moms_max; imom++)
     {
+      if(eq) ind_imom = imom;
+      else   ind_imom = tag_list[imom];
+      
       DeltaG_file[iRC]<<DeltaG_moms[tag_list[imom]][iRC]<<endl;
       DeltaZ_file[iRC]<<DeltaZ_moms[tag_list[imom]][iRC]<<endl;
     }

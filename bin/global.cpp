@@ -12,6 +12,8 @@ array<int,4> V;
 int APBC;
 int kron_delta[4][4]={{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 
+int eq;
+
 /* Action */
 double c1;
 double c12;

@@ -18,6 +18,8 @@ extern array<int,4> V;
 extern int APBC;
 extern int kron_delta[4][4];
 
+extern int eq;
+
 /* Action */
 extern double c1;
 extern double c12;
