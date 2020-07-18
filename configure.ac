@@ -51,6 +51,8 @@ AC_ARG_WITH(simd-inst-set,
 case "$with_simd_inst_set" in
      none) CPPFLAGS_SIMD=""
      	  SIMD_INST_SET=NONE;;
+     float128) CPPFLAGS_SIMD=""
+     	  SIMD_INST_SET=FLOAT128;;
      mmx) CPPFLAGS_SIMD="-mmmx"
      	  SIMD_INST_SET=MMX;;
      avx) CPPFLAGS_SIMD="-mavx"

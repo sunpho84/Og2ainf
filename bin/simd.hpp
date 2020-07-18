@@ -19,7 +19,16 @@ constexpr int N=4;
 using vtype=__m128d;
 constexpr int N=2;
 #else
-using vtype=std::array<double,1>;
+
+using FundVtype=
+#if SIMD_INST_SET == FLOAT128
+__float128
+#else
+  double
+#endif
+  ;
+
+using vtype=std::array<FundVtype,1>;
 constexpr int N=1;
 
 inline vtype& operator+=(vtype& l,const vtype& r)
