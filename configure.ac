@@ -45,14 +45,12 @@ AC_CHECK_HEADER(immintrin.h,
 
 #simd set to be used
 AC_ARG_WITH(simd-inst-set,
-	AS_HELP_STRING([--with-simd-inst-set=set],[Select the set of SIMD instruction (avx [default if possible], none [otherwise], float128, mmx or avx512)]),
+	AS_HELP_STRING([--with-simd-inst-set=set],[Select the set of SIMD instruction (avx [default if possible], none [otherwise], mmx or avx512)]),
 	with_simd_inst_set="${withval}",
 	with_simd_inst_set=avx)
 case "$with_simd_inst_set" in
      none) CPPFLAGS_SIMD=""
      	  SIMD_INST_SET=NONE;;
-     float128) CPPFLAGS_SIMD=""
-     	  SIMD_INST_SET=FLOAT128;;
      mmx) CPPFLAGS_SIMD="-mmmx"
      	  SIMD_INST_SET=MMX;;
      avx) CPPFLAGS_SIMD="-mavx"
@@ -76,6 +74,28 @@ fi
 AC_MSG_RESULT(with SIMD insttruction set ... ${with_simd_inst_set})
 AC_DEFINE_UNQUOTED([SIMD_INST_SET],[$SIMD_INST_SET],[Instruction set to be used])
 
+#real type to be used
+AC_ARG_WITH(real-type,
+	AS_HELP_STRING([--with-real-type=type],[Select the type used for real number: float, double (default) or quadruple]),
+	with_real_type="${withval}",
+	with_real_type=double)
+case "$with_real_type" in
+     float) REAL=float;;
+     double) REAL=double
+     	     SIMD_SUFF=d;;
+     quad) REAL=__float128
+     	   LIBS="$LIBS -lquadmath";;
+      *) AC_MSG_ERROR(["Unkwnown real type ${withval}"])
+esac
+
+if test "REAL" == "__float128" -a "$SIMD_INST_SET" != "NONE"
+then
+	AC_MSG_ERROR(["Cannot vectorize quadruple precision"])
+fi
+
+AC_MSG_RESULT(with real type ... ${with_real_type})
+AC_DEFINE_UNQUOTED([REAL],[$REAL],[Data type for real number])
+AC_DEFINE_UNQUOTED([SIMD_SUFF],[$SIMD_SUFF],[Suffix for simd data type])
 
 #openMP
 AC_OPENMP

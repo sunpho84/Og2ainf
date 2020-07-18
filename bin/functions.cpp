@@ -17,16 +17,16 @@
 using namespace std;
 
 
-vector<double> compute_V(double *Int)
+vector<Real> compute_V(Real *Int)
 {
-  vector<double> V(5);
-  double VV00, VV10, VV11, VV12;
-  double csw2 = csw*csw;
+  vector<Real> V(5);
+  Real VV00, VV10, VV11, VV12;
+  Real csw2 = csw*csw;
 
-  double h1[5] = {  4.0, -4.0, -2.0,  2.0, 0.0};
-  double h2[5] = { 16.0, 16.0,  4.0,  4.0, 0.0};
-  double h3[5] = {  1.0, -1.0,  0.5, -0.5, 0.0};
-  double h4[5];
+  Real h1[5] = {  4.0, -4.0, -2.0,  2.0, 0.0};
+  Real h2[5] = { 16.0, 16.0,  4.0,  4.0, 0.0};
+  Real h3[5] = {  1.0, -1.0,  0.5, -0.5, 0.0};
+  Real h4[5];
   for (int i=0; i<5; i++){
     h4[i] = (h2[i]/4.0-1.0)/3.0;
 
@@ -42,24 +42,24 @@ vector<double> compute_V(double *Int)
   return V;
 }
 
-double compute_S(double *Int)
+Real compute_S(Real *Int)
 {
-  double S = Int[0] + alpha*Int[1] + Int[2] + alpha*Int[3] + csw*Int[4] + csw*csw*Int[5];
+  Real S = Int[0] + alpha*Int[1] + Int[2] + alpha*Int[3] + csw*Int[4] + csw*csw*Int[5];
 
   return S ;
 }
 
 
-vector<double> compute_Z(double *Int, double *IntS)
+vector<Real> compute_Z(Real *Int, Real *IntS)
 {
-  vector<double> Z(6);
+  vector<Real> Z(6);
 
-  vector<double> V=compute_V(Int);
-  double S=compute_S(IntS);
+  vector<Real> V=compute_V(Int);
+  Real S=compute_S(IntS);
 
-  // double g02 = 6.0/beta;
-  // double as = g02/(16.0*M_PI*M_PI)*4.0/3.0;
-  double as = 1.0/(16.0*M_PI*M_PI);
+  // Real g02 = 6.0/beta;
+  // Real as = g02/(16.0*M_PI*M_PI)*4.0/3.0;
+  Real as = 1.0/(16.0*M_PI*M_PI);
 
   Z[0] = -S*as;
   for(int i=0; i<5; i++)
@@ -69,16 +69,16 @@ vector<double> compute_Z(double *Int, double *IntS)
   return Z;
 }
 
-vector<double> compute_Gamma(double *Int, double *IntS)
+vector<Real> compute_Gamma(Real *Int, Real *IntS)
 {
-  vector<double> G(6);
+  vector<Real> G(6);
 
-  vector<double> V=compute_V(Int);
-  double S=compute_S(IntS);
+  vector<Real> V=compute_V(Int);
+  Real S=compute_S(IntS);
 
-  // double g02 = 6.0/beta;
-  // double as = g02/(16.0*M_PI*M_PI)*4.0/3.0;
-  double as = 1.0/(16.0*M_PI*M_PI);
+  // Real g02 = 6.0/beta;
+  // Real as = g02/(16.0*M_PI*M_PI)*4.0/3.0;
+  Real as = 1.0/(16.0*M_PI*M_PI);
 
   G[0] = -S*as;
   for(int i=0; i<5; i++)
@@ -88,14 +88,14 @@ vector<double> compute_Gamma(double *Int, double *IntS)
   return G;
 }
 
-inline double norm3(const array<double,4>& mom)
+inline Real norm3(const array<Real,4>& mom)
 {
   return mom[0]*mom[0]+mom[1]*mom[1]+mom[2]*mom[2];
 }
 
 void find_eqmoms(){
 
-  array<double,4> shift={0.0,0.0,0.0,0.0};
+  array<Real,4> shift={0.0,0.0,0.0,0.0};
   if(APBC) shift[3]+=0.5;
 
   ifstream input("mom_list.txt");
@@ -107,7 +107,7 @@ void find_eqmoms(){
 
   while(!input.eof())
   {
-    array<double,4> ap;
+    array<Real,4> ap;
     array<int,4> np;
 
     /* mom_list.txt is in the order T,L,L,L */

@@ -6,7 +6,7 @@
 
 #define DEFAULT_STR_VAL "null"
 #define DEFAULT_INT_VAL -1
-#define DEFAULT_DOUBLE_VAL 1.2345
+#define DEFAULT_REAL_VAL 1.2345
 
 using namespace std;
 
@@ -46,7 +46,7 @@ TK_glb_t get_TK_glb(FILE *fin)
 template <class T>
 void _get_value_glb(FILE *fin,T &ret,const char *t)
 {
-    TK_glb_t tk=get_TK_glb(fin);
+  TK_glb_t tk=get_TK_glb(fin);
     if(tk!=VALUE_GLB_TK)
     {
         fprintf(stderr,"Getting token %s in the wrong place\n",tok);
@@ -54,7 +54,6 @@ void _get_value_glb(FILE *fin,T &ret,const char *t)
     }
 
     int rc=sscanf(tok,t,&ret);
-
     if(rc!=1)
     {
         fprintf(stderr,"Converting %s to %s failed\n",tok,t);
@@ -62,9 +61,11 @@ void _get_value_glb(FILE *fin,T &ret,const char *t)
     }
 }
 
-void get_value_glb(FILE *fin,double &out)
+void get_value_glb(FILE *fin,Real &out)
 {
-    return _get_value_glb(fin,out,"%lg");
+  double tmp;
+   _get_value_glb(fin,tmp,"%lg");
+  out=tmp;
 }
 
 void get_value_glb(FILE *fin,int &out)
@@ -100,11 +101,11 @@ void check_int_par(const int val,const char *name)
     }
 }
 
-void check_double_par(const double val,const char *name)
+void check_real_par(const Real val,const char *name)
 {
-    if(val==DEFAULT_DOUBLE_VAL)
+    if(val==DEFAULT_REAL_VAL)
     {
-        fprintf(stderr,"%s not initialized\n",name);
+      fprintf(stderr,"%s not initialized: %lg %lg\n",name,(double)val,DEFAULT_REAL_VAL);
         exit(UNINITIALIZED_PAR);
     }
 }
@@ -122,11 +123,11 @@ void read_input_glb(const char path[])
     L      = DEFAULT_INT_VAL;
     APBC   = DEFAULT_INT_VAL;
     action = DEFAULT_INT_VAL;
-    beta   = DEFAULT_DOUBLE_VAL;
-    csw    = DEFAULT_DOUBLE_VAL;
-    alpha  = DEFAULT_DOUBLE_VAL;
-    r      = DEFAULT_DOUBLE_VAL;
-    al     = DEFAULT_DOUBLE_VAL;
+    beta   = DEFAULT_REAL_VAL;
+    csw    = DEFAULT_REAL_VAL;
+    alpha  = DEFAULT_REAL_VAL;
+    r      = DEFAULT_REAL_VAL;
+    al     = DEFAULT_REAL_VAL;
     eq     = DEFAULT_INT_VAL;
 
     while(not feof(fin))
@@ -175,11 +176,11 @@ void read_input_glb(const char path[])
     check_int_par(L, L_tag);
     check_int_par(APBC, APBC_tag);
     check_int_par(action,action_tag);
-    check_double_par(beta,beta_tag);
-    check_double_par(csw,csw_tag);
-    check_double_par(alpha,alpha_tag);
-    check_double_par(r,r_tag);
-    check_double_par(al,al_tag);
+    check_real_par(beta,beta_tag);
+    check_real_par(csw,csw_tag);
+    check_real_par(alpha,alpha_tag);
+    check_real_par(r,r_tag);
+    check_real_par(al,al_tag);
     check_int_par(eq,eq_tag);
 
     fclose(fin);
@@ -208,7 +209,7 @@ void read_input_glb(const char path[])
     c12 = c1*c1;
     c13 = c12*c1;
 
-    printf("Action: %s  (c1 = %.3lf)\n",action_name.c_str(),c1);
+    printf("Action: %s  (c1 = %.3lf)\n",action_name.c_str(),(double)c1);
 
     printf("Gauge: ");
     if(alpha==0.0) printf("Landau\n");

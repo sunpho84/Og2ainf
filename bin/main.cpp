@@ -27,11 +27,10 @@
 #define F0 4.36923
 #define Z0 0.154933
 
-
-array<double,4> p;
-double P2;
-double PxSINP;
-vector<double> j,k,kt,kt2_v,kt4_v,kt6_v,s_v,ss_v,s2_v,ss2_v,c_v,cc_v,
+array<Real,4> p;
+Real P2;
+Real PxSINP;
+vector<Real> j,k,kt,kt2_v,kt4_v,kt6_v,s_v,ss_v,s2_v,ss2_v,c_v,cc_v,
 kn,kp,sp_v,cp_v,sp2_v,sq2_v,ssp_v,ssp2_v;
 
 template <typename F>
@@ -65,9 +64,9 @@ void intComp(std::array<F,12>& Int,std::array<F,10>& IntS,std::array<int,N> i)
 
   for(int x=0;x<N;x++)
   {
-    Fac[x] = j[i1[x]]*j[i2[x]]*j[i3[x]]*j[i4[x]+L]*16.0*M_PI*M_PI/((double)(L*L*L*T));
+    Fac[x] = j[i1[x]]*j[i2[x]]*j[i3[x]]*j[i4[x]+L]*16.0*M_PI*M_PI/((Real)(L*L*L*T));
 
-    auto fill=[x,i1,i2,i3,i4](array<F,4>& kt,const vector<double>& kt_v)
+    auto fill=[x,i1,i2,i3,i4](array<F,4>& kt,const vector<Real>& kt_v)
     {
       kt[0][x] = kt_v[i1[x]];
       kt[1][x] = kt_v[i2[x]];
@@ -84,7 +83,7 @@ void intComp(std::array<F,12>& Int,std::array<F,10>& IntS,std::array<int,N> i)
     fill(c,c_v);
     fill(cc,cc_v);
 
-    auto fill3=[x,i1,i2,i3,i4](array<F,4>& t,const vector<double>& t_v)
+    auto fill3=[x,i1,i2,i3,i4](array<F,4>& t,const vector<Real>& t_v)
     {
       t[0][x] = t_v[i1[x]];
       t[1][x] = t_v[i2[x]+L];
@@ -291,6 +290,8 @@ int main(int narg,char **arg)
 
   cout<<"Vectorization with N = "<<N<<endl;
   cout<<endl;
+  cout<<"Real type: "<<TO_STRING(REAL)<<endl;
+  
 
   #pragma omp parallel for
   for(int l=0; l<LT; l++)
@@ -320,19 +321,25 @@ int main(int narg,char **arg)
   find_eqmoms();
 
   // Compute RC corrections for independent external momenta
-  vector<vector<double>> DeltaZ_moms, DeltaG_moms;
+  vector<vector<Real>> DeltaZ_moms, DeltaG_moms;
 
   for(int imom=0; imom<eqmoms; imom++)
   {
     cout<<"\r"<<imom+1<<"/"<<eqmoms<<flush;
 
-    array<double,4> ap = ap_eq[imom];
+    array<Real,4> ap = ap_eq[imom];
 
     P2 = norm4(ap);
     PxSINP = P2;
     Np0 = 4.0 - count(ap.begin(), ap.end(), 0.0);
-
-    double eps=1.0e-14;
+    
+    Real eps=
+#if SIMD_INST_SET == FLOAt128
+      1.0e-28
+#else
+      1.0e-14
+#endif
+      ;
     for(int mu=0; mu<4; mu++)
     {
       if(fabs(sin(ap[mu]))>eps) p[mu] = P2/Np0/sin(ap[mu]);
@@ -369,8 +376,8 @@ int main(int narg,char **arg)
       ssp2_v[j] = ssp_v[j]*ssp_v[j];
     }
 
-    double Int[12]={0.0};
-    double IntS[10]={0.0};
+    Real Int[12]={0.0};
+    Real IntS[10]={0.0};
 
     if(L*L*L*T%N!=0)
     {
@@ -414,8 +421,8 @@ int main(int narg,char **arg)
     // }
 
     // string RCs[6] = {"q","S","P","V","A","T"};
-    vector<double> DeltaZ = compute_Z(Int,IntS);
-    vector<double> DeltaG = compute_Gamma(Int,IntS);
+    vector<Real> DeltaZ = compute_Z(Int,IntS);
+    vector<Real> DeltaG = compute_Gamma(Int,IntS);
 
 
     // printf("--- CORRECTIONS O(g2ainf) -- \n");
@@ -446,8 +453,8 @@ int main(int narg,char **arg)
       if(eq) ind_imom = imom;
       else   ind_imom = tag_list[imom];
       
-      DeltaG_file[iRC]<<DeltaG_moms[ind_imom][iRC]<<endl;
-      DeltaZ_file[iRC]<<DeltaZ_moms[ind_imom][iRC]<<endl;
+      DeltaG_file[iRC]<<(double)DeltaG_moms[ind_imom][iRC]<<endl;
+      DeltaZ_file[iRC]<<(double)DeltaZ_moms[ind_imom][iRC]<<endl;
     }
   }
 

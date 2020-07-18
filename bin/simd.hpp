@@ -1,34 +1,37 @@
 #ifndef _SIMD_HPP
 #define _SIMD_HPP
 
+#ifdef HAVE_CONFIG_H
+#include <config.hpp>
+#endif
+
 #include <array>
 
 #include <immintrin.h>
+
+#include "preprocessor.hpp"
+#include "real.hpp"
 
 #define MMX 2
 #define AVX 4
 #define AVX512 8
 
 #if SIMD_INST_SET == AVX512
-using vtype=__m512d;
-constexpr int N=8;
+ #define SIMD_NBITS 512
 #elif SIMD_INST_SET == AVX
-using vtype=__m256d;
-constexpr int N=4;
+ #define SIMD_NBITS 256
 #elif SIMD_INST_SET == MMX
-using vtype=__m128d;
-constexpr int N=2;
-#else
-
-using FundVtype=
-#if SIMD_INST_SET == FLOAT128
-__float128
-#else
-  double
+ #define SIMD_NBITS 128
 #endif
-  ;
 
-using vtype=std::array<FundVtype,1>;
+#if SIMD_INST_SET != NONE
+
+using vtype=CONCAT3(__m,SIMD_NBITS,SIMD_SUFF);
+constexpr int N=sizeof(vtype)/sizeof(Real);
+
+#else
+
+using vtype=std::array<Real,1>;
 constexpr int N=1;
 
 inline vtype& operator+=(vtype& l,const vtype& r)
