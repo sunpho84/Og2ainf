@@ -45,7 +45,7 @@ AC_CHECK_HEADER(immintrin.h,
 
 #simd set to be used
 AC_ARG_WITH(simd-inst-set,
-	AS_HELP_STRING([--with-simd-inst-set=set],[Select the set of SIMD instruction (avx [default if possible], none [otherwise], mmx or avx512)]),
+	AS_HELP_STRING([--with-simd-inst-set=set],[Select the set of SIMD instruction (avx [default if possible], none [otherwise], float128, mmx or avx512)]),
 	with_simd_inst_set="${withval}",
 	with_simd_inst_set=avx)
 case "$with_simd_inst_set" in
