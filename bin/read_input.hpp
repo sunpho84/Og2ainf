@@ -6,7 +6,7 @@
 
 enum ERR_t{NO_FAIL,FAILED_READ,FAILED_CONVERSION,FAILED_OPEN,MISPLACED_TK,UNINITIALIZED_PAR};
 
-enum TK_glb_t{FEOF_GLB_TK,VALUE_GLB_TK, L_TK,APBC_TK,ACTION_TK,BETA_TK,CSW_TK,ALPHA_TK,R_TK,AL_TK};
+enum TK_glb_t{FEOF_GLB_TK,VALUE_GLB_TK, L_TK,APBC_TK,ACTION_TK,BETA_TK,CSW_TK,ALPHA_TK,R_TK,AL_TK,EQ_TK};
 
 const char L_tag[]="L";
 const char APBC_tag[]="APBC";
@@ -16,7 +16,7 @@ const char csw_tag[]="Csw";
 const char alpha_tag[]="Alpha";
 const char r_tag[]="R";
 const char al_tag[]="al";
-
+const char eq_tag[]="OnlyEqmoms";
 
 // parse the value string
 template <class T>

@@ -1,47 +1,11 @@
 #ifndef FUNC_HPP
 #define FUNC_HPP
 
+#include "simd.hpp"
+#include <array>
 
-using namespace Eigen;
+// using namespace Eigen;
 using namespace std;
-
-// inline Vector4d cwiseProduct(Vector4d a, Vector4d b)
-// {
-//   return a.cwiseProduct(b);
-// }
-// inline Vector4d cwiseProduct(Vector4d a, Vector4d b, Vector4d c)
-// {
-//   return a.cwiseProduct(b).cwiseProduct(c);
-// }
-// inline Vector4d cwiseProduct(Vector4d a, Vector4d b, Vector4d c, Vector4d d)
-// {
-//   return a.cwiseProduct(b).cwiseProduct(c).cwiseProduct(d);
-// }
-// inline Vector4d cwiseProduct(Vector4d a, Vector4d b, Vector4d c, Vector4d d, Vector4d e)
-// {
-//   return a.cwiseProduct(b).cwiseProduct(c).cwiseProduct(d).cwiseProduct(e);
-// }
-
-// inline double prod(Vector4d a)
-// {
-//   return a.dot(Id);
-// }
-// inline double prod(Vector4d a,Vector4d b)
-// {
-//   return a.dot(b);
-// };
-// inline double prod(Vector4d a,Vector4d b,Vector4d c)
-// {
-//   return cwiseProduct(a,b,c).dot(Id);
-// };
-// inline double prod(Vector4d a,Vector4d b,Vector4d c,Vector4d d)
-// {
-//   return cwiseProduct(a,b,c,d).dot(Id);
-// };
-// inline double prod(Vector4d a,Vector4d b,Vector4d c,Vector4d d,Vector4d e)
-// {
-//   return cwiseProduct(a,b,c,d,e).dot(Id);
-// };
 
 template <typename T>
 inline array<array<T,4>,4> make_propagator(array<T,4> kt2_dir, array<T,4> kt4_dir, array<T,4> kt6_dir)
@@ -60,8 +24,11 @@ inline array<array<T,4>,4> make_propagator(array<T,4> kt2_dir, array<T,4> kt4_di
   for(int mu=0; mu<4; mu++)
     for(int nu=0; nu<4; nu++){
 
-      ktpo2[mu][nu]=1.0;
-      ktso2[mu][nu]=0.0;
+      for(int x=0;x<sizeof(T)/sizeof(double);x++)
+      {
+        ktpo2[mu][nu][x]=1.0;
+        ktso2[mu][nu][x]=0.0;
+      }
 
       for(int rho=0;rho<4;rho++){
         if(mu!=rho && nu!=rho)
@@ -88,10 +55,14 @@ inline array<array<T,4>,4> make_propagator(array<T,4> kt2_dir, array<T,4> kt4_di
   return A;
 }
 
-vector<double> compute_Z(valarray<double>& Int,valarray<double>& IntS);
+vector<double> compute_Gamma(double *Int, double *IntS);
+vector<double> compute_Z(double *Int, double *IntS);
 
-// vector<double> compute_V(valarray<double>& Int);
-// double compute_S(valarray<double>& Int);
+inline double norm4(const array<double,4>& mom)
+{
+  return mom[0]*mom[0]+mom[1]*mom[1]+mom[2]*mom[2]+mom[3]*mom[3];
+}
 
+void find_eqmoms();
 
 #endif
