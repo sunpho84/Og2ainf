@@ -88,7 +88,7 @@ case "$with_real_type" in
       *) AC_MSG_ERROR(["Unkwnown real type ${withval}"])
 esac
 
-if test "REAL" == "__float128" -a "$SIMD_INST_SET" != "NONE"
+if test "$REAL" == "__float128" -a "$SIMD_INST_SET" != "NONE"
 then
 	AC_MSG_ERROR(["Cannot vectorize quadruple precision"])
 fi
